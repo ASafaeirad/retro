@@ -1,6 +1,8 @@
 import { useConvexMutation } from "@convex-dev/react-query";
+import { Crosshair } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "#components/ui/avatar.tsx";
+import { Badge } from "#components/ui/badge.tsx";
 import { api } from "#convex/api";
 import { cn } from "#lib/cn";
 import { allMoods, type Mood, moodEmojis, toMood } from "#models/mood.model.ts";
@@ -59,9 +61,7 @@ export function ParticipantList({
 
   return (
     <div className={cn("rounded-lg border p-4", className)}>
-      <h3 className="mb-3 text-sm font-semibold">
-        Participants ({participants.length})
-      </h3>
+      <h3 className="mb-3 text-sm font-semibold">Participants</h3>
 
       <div className="space-y-2">
         {participants.map((participant) => {
@@ -74,154 +74,84 @@ export function ParticipantList({
               key={participant._id}
               onClick={() => onSelectPresenter?.(participant.name)}
               className={cn(
-                "flex items-center justify-between rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 transition-colors",
-                onSelectPresenter &&
-                  "cursor-pointer hover:bg-[var(--link-bg-hover)]",
-                currentPresenter === participant.name &&
-                  "ring-2 ring-[var(--lagoon)] border-[var(--lagoon)]",
-                !isActive && "opacity-50",
+                "rounded border py-2 px-3 flex items-center gap-2",
+                {
+                  "cursor-pointer": onSelectPresenter,
+                  "ring-2": onSelectPresenter && isCurrentUser,
+                  "opacity-50": onSelectPresenter,
+                },
               )}
             >
-              <div className="flex items-center gap-2">
-                {/* Active/Ready status indicator */}
-                <div
-                  className={cn(
-                    "h-2 w-2 rounded-full",
-                    !isActive
-                      ? "bg-[var(--sand)]" // Inactive (gray)
-                      : participant.isReady
-                        ? "bg-[var(--lagoon)]" // Ready (blue)
-                        : "bg-[var(--palm)]", // Active but not ready (green)
-                  )}
-                />
-
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1">
-                    {/* Mood emoji - clickable for current user */}
-                    {isCurrentUser && editingMoodFor === participant.name ? (
-                      <div className="flex gap-1">
-                        {allMoods.map((option) => (
-                          <Button
-                            key={option}
-                            type="button"
-                            variant="neutral"
-                            size="sm"
-                            onClick={() =>
-                              handleMoodChange(participant.name, option)
-                            }
-                            title={option}
-                          >
-                            {moodEmojis[option]}
-                          </Button>
-                        ))}
-                        {participant.mood && (
-                          <Button
-                            type="button"
-                            variant="neutral"
-                            size="sm"
-                            onClick={() =>
-                              handleMoodChange(participant.name, undefined)
-                            }
-                            title="Remove mood"
-                          >
-                            ✕
-                          </Button>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        <Avatar
-                          className={cn({ "cursor-pointer": isCurrentUser })}
-                          onClick={() => {
-                            if (!isCurrentUser) return;
-                            setEditingMoodFor(participant.name);
-                          }}
-                          title={
-                            isCurrentUser
-                              ? "Click to change mood"
-                              : "Previous sprint mood"
-                          }
-                        >
-                          <AvatarFallback>{moodEmojis[mood]}</AvatarFallback>
-                        </Avatar>
-                        <span
-                          className={cn(
-                            "text-sm",
-                            isActive
-                              ? "text-[var(--sea-ink)]"
-                              : "text-[var(--sea-ink-soft)]",
-                            isCurrentUser &&
-                              !participant.mood &&
-                              "cursor-pointer hover:opacity-70",
-                          )}
-                          onClick={(e) => {
-                            if (isCurrentUser && !participant.mood) {
-                              e.stopPropagation();
-                              setEditingMoodFor(participant.name);
-                            }
-                          }}
-                          title={
-                            isCurrentUser && !participant.mood
-                              ? "Click to add mood"
-                              : undefined
-                          }
-                        >
-                          {participant.name}
-                          {participant.name === scrumMaster && (
-                            <span className="ml-2 text-xs text-[var(--kicker)] font-medium">
-                              (SM)
-                            </span>
-                          )}
-                          {isCurrentUser && (
-                            <span className="ml-2 text-xs text-[var(--sea-ink-soft)] font-medium">
-                              (You)
-                            </span>
-                          )}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  {!isActive && (
-                    <span className="text-xs text-[var(--sea-ink-soft)]">
-                      Disconnected
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {participant.isReady && isActive && (
-                  <span className="text-xs text-[var(--lagoon)] font-medium">
-                    Ready
-                  </span>
-                )}
-
-                {/* Remove button for scrum master */}
-                {isScrumMaster &&
-                  !isCurrentUser &&
-                  onRemoveParticipant &&
-                  !isActive && (
+              {isCurrentUser && editingMoodFor === participant.name ? (
+                <div className="flex gap-1">
+                  {allMoods.map((option) => (
                     <Button
+                      key={option}
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveParticipant(participant._id);
-                      }}
                       variant="neutral"
                       size="sm"
-                      title="Remove participant"
+                      onClick={() => handleMoodChange(participant.name, option)}
+                      title={option}
                     >
-                      Remove
+                      {moodEmojis[option]}
+                    </Button>
+                  ))}
+                  {participant.mood && (
+                    <Button
+                      type="button"
+                      variant="neutral"
+                      size="sm"
+                      onClick={() =>
+                        handleMoodChange(participant.name, undefined)
+                      }
+                      title="Remove mood"
+                    >
+                      ✕
                     </Button>
                   )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex flex-1 gap-2 items-center">
+                  <Avatar
+                    className={cn({ "cursor-pointer": isCurrentUser })}
+                    onClick={() => {
+                      if (!isCurrentUser) return;
+                      setEditingMoodFor(participant.name);
+                    }}
+                    title={
+                      isCurrentUser
+                        ? "Click to change mood"
+                        : "Previous sprint mood"
+                    }
+                  >
+                    <AvatarFallback>{moodEmojis[mood]}</AvatarFallback>
+                  </Avatar>
+                  <span className={cn("text-sm")}>{participant.name}</span>
+                  {participant.name === scrumMaster && (
+                    <Badge size="xs">SM</Badge>
+                  )}
+                </div>
+              )}
+              {isScrumMaster && !isCurrentUser && !isActive && (
+                <Button
+                  onClick={() => {
+                    onRemoveParticipant?.(participant._id);
+                  }}
+                  variant="danger"
+                  shadow="reverse"
+                  size="xs"
+                  title="Remove participant"
+                >
+                  <Crosshair />
+                </Button>
+              )}
             </div>
           );
         })}
       </div>
 
       {participants.length > 0 && (
-        <div className="mt-4 text-xs text-[var(--sea-ink-soft)]">
+        <div className="mt-4 text-xs">
           {participants.filter((p) => p.isReady).length} / {participants.length}{" "}
           ready
         </div>
@@ -233,7 +163,6 @@ export function ParticipantList({
           type="button"
           onClick={onLeaveSession}
           variant="neutral"
-          size="sm"
           className="mt-4 w-full"
         >
           Leave Session

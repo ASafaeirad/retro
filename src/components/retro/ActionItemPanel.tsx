@@ -66,7 +66,7 @@ export function ActionItemPanel({
           <div
             key={item._id}
             className={cn(
-              "rounded-md border border-[var(--line)] bg-[var(--chip-bg)] p-3 transition-colors",
+              "rounded-md border p-3 transition-colors",
               item.completed && "opacity-60",
             )}
           >
@@ -74,10 +74,10 @@ export function ActionItemPanel({
               {onToggleComplete && (
                 <Button
                   onClick={() => onToggleComplete(item._id)}
-                  variant="noShadow"
+                  shadow="none"
                   size="icon"
                   className={cn(
-                    "mt-0.5 h-4 w-4 flex-shrink-0 rounded border-2 transition-colors",
+                    "mt-0.5 h-4 w-4 shrink-0 rounded border-2 transition-colors",
                     item.completed
                       ? "border-[var(--lagoon)] bg-[var(--lagoon)]"
                       : "border-[var(--line)] bg-transparent",

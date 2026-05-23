@@ -52,7 +52,7 @@ function UngroupedZone({ children }: { children: ReactNode }) {
       ref={ref}
       className={cn(
         "grid grid-cols-4 gap-3 rounded-lg p-4 transition-colors min-h-[200px]",
-        isDropTarget && "bg-[var(--link-bg-hover)] ring-2 ring-[var(--lagoon)]",
+        isDropTarget && " ring-2 ",
       )}
     >
       {children}
@@ -121,7 +121,7 @@ function RetroBoard() {
   const [editingTicketId, setEditingTicketId] = useState<Id<"tickets"> | null>(
     null,
   );
-  const [newvoteLimit, setNewvoteLimit] = useState("");
+  const [newVoteLimit, setNewVoteLimit] = useState("");
   const [selectedParticipantFilter, setSelectedParticipantFilter] = useState<
     string | null
   >(null);
@@ -194,8 +194,8 @@ function RetroBoard() {
 
   if (!session || !participants || !tickets) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
-        <div className="text-[var(--sea-ink)]">Loading session...</div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div>Loading session...</div>
       </div>
     );
   }
@@ -288,7 +288,7 @@ function RetroBoard() {
       clearSession(sessionId as Id<"sessions">);
 
       // Navigate back to session list
-      navigate({ to: "/retro" });
+      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to leave session:", error);
       alert("Failed to leave session. Please try again.");
@@ -397,13 +397,13 @@ function RetroBoard() {
 
   // Set vote count
   const handleSetvoteLimit = async () => {
-    const count = Number(newvoteLimit);
+    const count = Number(newVoteLimit);
     if (count > 0) {
       await setvoteLimit({
         sessionId: sessionId as Id<"sessions">,
         voteLimit: count,
       });
-      setNewvoteLimit("");
+      setNewVoteLimit("");
     }
   };
 
@@ -413,11 +413,9 @@ function RetroBoard() {
       case "REVIEW_ACTIONS":
         return (
           <div className="mx-auto max-w-4xl">
-            <div className="mb-6 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
-                Review Action Items
-              </h2>
-              <p className="text-[var(--sea-ink-soft)]">
+            <div className="mb-6 rounded-lg border   p-6">
+              <h2 className="mb-2 text-2xl font-bold ">Review Action Items</h2>
+              <p className="">
                 Review action items from Sprint {session.sprintNumber - 1}
               </p>
             </div>
@@ -431,10 +429,8 @@ function RetroBoard() {
                 }
               />
             ) : (
-              <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center">
-                <p className="text-[var(--sea-ink-soft)]">
-                  No action items from previous sprint
-                </p>
+              <div className="rounded-lg border   p-8 text-center">
+                <p className="">No action items from previous sprint</p>
               </div>
             )}
           </div>
@@ -446,11 +442,9 @@ function RetroBoard() {
 
         return (
           <div>
-            <div className="mb-6 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
-                Add Tickets
-              </h2>
-              <p className="text-[var(--sea-ink-soft)]">
+            <div className="mb-6 rounded-lg border   p-6">
+              <h2 className="mb-2 text-2xl font-bold ">Add Tickets</h2>
+              <p className="">
                 Add tickets to the board. Mark yourself as ready when done.
               </p>
 
@@ -556,11 +550,9 @@ function RetroBoard() {
 
         return (
           <div>
-            <div className="mb-6 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
-                Present Tickets
-              </h2>
-              <p className="text-[var(--sea-ink-soft)]">
+            <div className="mb-6 rounded-lg border   p-6">
+              <h2 className="mb-2 text-2xl font-bold ">Present Tickets</h2>
+              <p className="">
                 {selectedParticipantFilter
                   ? `Focusing on ${selectedParticipantFilter}'s tickets`
                   : "Select a participant to focus on their tickets"}
@@ -616,11 +608,9 @@ function RetroBoard() {
         return (
           <DragDropProvider onDragEnd={handleDragEnd}>
             <div>
-              <div className="mb-6 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-                <h2 className="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
-                  Group Tickets
-                </h2>
-                <p className="text-[var(--sea-ink-soft)]">
+              <div className="mb-6 rounded-lg border p-6">
+                <h2 className="mb-2 text-2xl font-bold ">Group Tickets</h2>
+                <p className="">
                   Drag and drop related tickets together to create groups
                 </p>
               </div>
@@ -629,11 +619,8 @@ function RetroBoard() {
               {ticketGroups && ticketGroups.length > 0 && (
                 <div className="mb-6 space-y-4">
                   {ticketGroups.map((group) => (
-                    <div
-                      key={group._id}
-                      className="rounded-lg border-2 border-[var(--palm)] bg-[var(--surface)] p-4"
-                    >
-                      <div className="mb-3 text-sm font-semibold text-[var(--sea-ink)]">
+                    <div key={group._id} className="rounded-lg border-2 p-4">
+                      <div className="mb-3 text-sm font-semibold ">
                         Group ({group.tickets.length} tickets)
                       </div>
                       <div className="grid grid-cols-4 gap-3">
@@ -654,7 +641,7 @@ function RetroBoard() {
 
               {/* Ungrouped tickets */}
               <div>
-                <div className="mb-3 text-sm font-semibold text-[var(--sea-ink)]">
+                <div className="mb-3 text-sm font-semibold ">
                   Ungrouped Tickets
                 </div>
                 <UngroupedZone>
@@ -678,11 +665,9 @@ function RetroBoard() {
 
         return (
           <div>
-            <div className="mb-6 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
-                Vote on Tickets
-              </h2>
-              <p className="text-[var(--sea-ink-soft)]">
+            <div className="mb-6 rounded-lg border p-6">
+              <h2 className="mb-2 text-2xl font-bold ">Vote on Tickets</h2>
+              <p className="">
                 {session.voteLimit
                   ? `You have ${votesLeft} votes remaining`
                   : "Waiting for scrum master to set vote count"}
@@ -692,13 +677,13 @@ function RetroBoard() {
                 <div className="mt-4 flex gap-2">
                   <input
                     type="number"
-                    value={newvoteLimit}
-                    onChange={(e) => setNewvoteLimit(e.target.value)}
+                    value={newVoteLimit}
+                    onChange={(e) => setNewVoteLimit(e.target.value)}
                     placeholder="Votes per person"
-                    className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)]"
+                    className="rounded-md border bg-white px-3 py-2 text-sm "
                     min="1"
                   />
-                  <Button onClick={handleSetvoteLimit} disabled={!newvoteLimit}>
+                  <Button onClick={handleSetvoteLimit} disabled={!newVoteLimit}>
                     Set Vote Count
                   </Button>
                 </div>
@@ -713,12 +698,9 @@ function RetroBoard() {
                     (vote) => vote.groupId === group._id,
                   );
                   return (
-                    <div
-                      key={group._id}
-                      className="rounded-lg border-2 border-[var(--palm)] bg-[var(--surface)] p-4"
-                    >
+                    <div key={group._id} className="rounded-lg border-2   p-4">
                       <div className="mb-3 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-[var(--sea-ink)]">
+                        <div className="text-sm font-semibold ">
                           Group ({group.tickets.length} tickets)
                         </div>
                         {session.voteLimit && (
@@ -779,11 +761,11 @@ function RetroBoard() {
       case "DISCUSS":
         return (
           <div>
-            <div className="mb-6 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-              <h2 className="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
+            <div className="mb-6 rounded-lg border   p-6">
+              <h2 className="mb-2 text-2xl font-bold ">
                 Discuss & Create Action Items
               </h2>
-              <p className="text-[var(--sea-ink-soft)]">
+              <p className="">
                 Discuss tickets sorted by votes and create action items
               </p>
             </div>
@@ -819,15 +801,13 @@ function RetroBoard() {
                   key={item._id}
                   className={cn(
                     "rounded-lg border-2 p-4",
-                    session.currentDiscussionTicket === item._id
-                      ? "border-[var(--lagoon)] bg-[var(--surface)]"
-                      : "border-[var(--line)] bg-[var(--surface)]",
+                    session.currentDiscussionTicket === item._id ? " " : " ",
                   )}
                 >
                   {item.type === "group" && ticketGroups ? (
                     <div>
                       <div className="mb-3 flex items-center justify-between">
-                        <div className="text-sm font-semibold text-[var(--sea-ink)]">
+                        <div className="text-sm font-semibold ">
                           Group ({item.tickets?.length || 0} tickets) •{" "}
                           {item.voteLimit} votes
                         </div>
@@ -892,14 +872,12 @@ function RetroBoard() {
       case "COMPLETED":
         return (
           <div className="mx-auto max-w-4xl text-center">
-            <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-12">
-              <h2 className="mb-4 text-3xl font-bold text-[var(--sea-ink)]">
-                Retro Completed! 🎉
-              </h2>
-              <p className="mb-6 text-[var(--sea-ink-soft)]">
+            <div className="rounded-lg border   p-12">
+              <h2 className="mb-4 text-3xl font-bold ">Retro Completed! 🎉</h2>
+              <p className="mb-6 ">
                 Sprint {session.sprintNumber} retrospective is complete
               </p>
-              <Button onClick={() => navigate({ to: "/retro" })}>
+              <Button onClick={() => navigate({ to: "/" })}>
                 Back to Sessions
               </Button>
             </div>
@@ -912,20 +890,20 @@ function RetroBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] py-8 px-4">
+    <div className="min-h-screen  py-8 px-4">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[var(--sea-ink)]">
+            <h1 className="text-3xl font-bold ">
               Sprint {session.sprintNumber} Retro
             </h1>
-            <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
+            <p className="mt-1 text-sm ">
               Phase: {session.phase.replace("_", " ")} • Logged in as: {name}
             </p>
           </div>
 
-          <Button onClick={() => navigate({ to: "/retro" })} variant="neutral">
+          <Button onClick={() => navigate({ to: "/" })} variant="neutral">
             ← Back
           </Button>
         </div>
@@ -933,7 +911,7 @@ function RetroBoard() {
         {/* Main content with sidebar */}
         <div className="flex gap-6">
           {/* Sidebar */}
-          <div className="w-64 flex-shrink-0 space-y-4">
+          <div className="w-64 shrink-0 space-y-4">
             <ParticipantList
               participants={participants}
               scrumMaster={session.createdBy}
@@ -1038,12 +1016,10 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)] px-4">
-      <div className="w-full max-w-md rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8">
-        <h2 className="mb-4 text-2xl font-bold text-[var(--sea-ink)]">
-          Enter Your Name
-        </h2>
-        <p className="mb-6 text-sm text-[var(--sea-ink-soft)]">
+    <div className="flex min-h-screen items-center justify-center  px-4">
+      <div className="w-full max-w-md rounded-lg border   p-8">
+        <h2 className="mb-4 text-2xl font-bold ">Enter Your Name</h2>
+        <p className="mb-6 text-sm ">
           Please enter your name to join this retro session
         </p>
 
@@ -1053,7 +1029,7 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
-            className="mb-4 w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-4 py-3 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
+            className="mb-4 w-full rounded-md border  bg-white dark: px-4 py-3 text-sm  placeholder: focus: focus:outline-none focus:ring-1 focus:"
             autoFocus
             required
           />
@@ -1068,7 +1044,7 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
         </form>
 
         <Button
-          onClick={() => navigate({ to: "/retro" })}
+          onClick={() => navigate({ to: "/" })}
           variant="neutral"
           className="mt-4 w-full"
         >

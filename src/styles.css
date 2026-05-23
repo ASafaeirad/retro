@@ -8,6 +8,7 @@
   --main-foreground: oklch(0% 0 0);
   --main: oklch(77.54% 0.1681 162.78);
   --border: oklch(0% 0 0);
+  --danger: #FF4D50;
   --ring: oklch(0% 0 0);
   --overlay: oklch(0% 0 0 / 0.8);
   --shadow: 4px 4px 0px 0px var(--border);
@@ -22,6 +23,7 @@
 @theme inline {
   --color-main: var(--main);
   --color-background: var(--background);
+  --color-danger: var(--danger);
   --color-secondary-background: var(--secondary-background);
   --color-foreground: var(--foreground);
   --color-main-foreground: var(--main-foreground);
