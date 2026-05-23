@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RetroIndexRouteImport } from './routes/retro/index'
+import { Route as RetroSessionIdRouteImport } from './routes/retro/$sessionId'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -22,31 +24,49 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RetroIndexRoute = RetroIndexRouteImport.update({
+  id: '/retro/',
+  path: '/retro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetroSessionIdRoute = RetroSessionIdRouteImport.update({
+  id: '/retro/$sessionId',
+  path: '/retro/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/retro/$sessionId': typeof RetroSessionIdRoute
+  '/retro/': typeof RetroIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/retro/$sessionId': typeof RetroSessionIdRoute
+  '/retro': typeof RetroIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/retro/$sessionId': typeof RetroSessionIdRoute
+  '/retro/': typeof RetroIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/about' | '/retro/$sessionId' | '/retro/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/about' | '/retro/$sessionId' | '/retro'
+  id: '__root__' | '/' | '/about' | '/retro/$sessionId' | '/retro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  RetroSessionIdRoute: typeof RetroSessionIdRoute
+  RetroIndexRoute: typeof RetroIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/retro/': {
+      id: '/retro/'
+      path: '/retro'
+      fullPath: '/retro/'
+      preLoaderRoute: typeof RetroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retro/$sessionId': {
+      id: '/retro/$sessionId'
+      path: '/retro/$sessionId'
+      fullPath: '/retro/$sessionId'
+      preLoaderRoute: typeof RetroSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  RetroSessionIdRoute: RetroSessionIdRoute,
+  RetroIndexRoute: RetroIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
