@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "#lib/cn";
+import { Button } from "#ui/button.tsx";
 
 interface AddTicketFormProps {
   category: "well" | "improve";
@@ -58,28 +59,23 @@ export function AddTicketForm({
       />
 
       <div className="flex gap-2">
-        <button
+        <Button
           type="submit"
           disabled={!text.trim() || isSubmitting}
-          className={cn(
-            "flex-1 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
-            text.trim() && !isSubmitting
-              ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
-              : "bg-[var(--line)] cursor-not-allowed",
-          )}
+          className="flex-1"
         >
           {isSubmitting ? "Adding..." : "Add Ticket"}
-        </button>
+        </Button>
 
         {onCancel && (
-          <button
+          <Button
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-4 py-2 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+            variant="neutral"
           >
             Cancel
-          </button>
+          </Button>
         )}
       </div>
     </form>

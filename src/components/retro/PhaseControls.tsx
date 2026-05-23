@@ -1,4 +1,5 @@
 import { cn } from "#lib/cn";
+import { Button } from "#ui/button.tsx";
 
 type Phase =
   | "REVIEW_ACTIONS"
@@ -88,27 +89,25 @@ export function PhaseControls({
       {/* Navigation buttons */}
       <div className="flex gap-2">
         {prevPhase && (
-          <button
+          <Button
             onClick={() => onPhaseChange(prevPhase.phase)}
-            className="flex-1 rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 text-xs font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+            variant="neutral"
+            size="sm"
+            className="flex-1"
           >
             ← Back
-          </button>
+          </Button>
         )}
 
         {nextPhase && (
-          <button
+          <Button
             onClick={() => onPhaseChange(nextPhase.phase)}
             disabled={!canAdvance}
-            className={cn(
-              "flex-1 rounded-md px-3 py-2 text-xs font-medium text-white transition-colors",
-              canAdvance
-                ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
-                : "bg-[var(--line)] cursor-not-allowed",
-            )}
+            size="sm"
+            className="flex-1"
           >
             {nextPhase.label} →
-          </button>
+          </Button>
         )}
       </div>
 

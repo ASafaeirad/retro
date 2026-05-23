@@ -21,6 +21,7 @@ import { TicketCard } from "#components/retro/TicketCard.tsx";
 import { Timer } from "#components/retro/Timer.tsx";
 import { api } from "#convex/api";
 import { cn } from "#lib/cn";
+import { Button } from "#ui/button.tsx";
 import type { Id } from "../../../convex/_generated/dataModel";
 import {
   clearSession,
@@ -452,17 +453,13 @@ function RetroBoard() {
               </p>
 
               {currentParticipant && (
-                <button
+                <Button
                   onClick={handleToggleReady}
-                  className={cn(
-                    "mt-4 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
-                    currentParticipant.isReady
-                      ? "bg-[var(--palm)] hover:opacity-90"
-                      : "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]",
-                  )}
+                  variant={currentParticipant.isReady ? "reverse" : "default"}
+                  className="mt-4"
                 >
                   {currentParticipant.isReady ? "✓ Ready" : "Mark as Ready"}
-                </button>
+                </Button>
               )}
             </div>
 
@@ -497,12 +494,13 @@ function RetroBoard() {
                     onCancel={() => setAddingTicketCategory(null)}
                   />
                 ) : (
-                  <button
+                  <Button
                     onClick={() => setAddingTicketCategory("well")}
-                    className="w-full rounded-lg border-2 border-dashed border-[var(--lagoon-deep)] bg-[var(--surface)] p-4 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+                    variant="neutral"
+                    className="w-full"
                   >
                     + Add Ticket
-                  </button>
+                  </Button>
                 )}
               </BoardColumn>
 
@@ -536,12 +534,13 @@ function RetroBoard() {
                     onCancel={() => setAddingTicketCategory(null)}
                   />
                 ) : (
-                  <button
+                  <Button
                     onClick={() => setAddingTicketCategory("improve")}
-                    className="w-full rounded-lg border-2 border-dashed border-[var(--palm)] bg-[var(--surface)] p-4 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+                    variant="neutral"
+                    className="w-full"
                   >
                     + Add Ticket
-                  </button>
+                  </Button>
                 )}
               </BoardColumn>
             </div>
@@ -697,18 +696,9 @@ function RetroBoard() {
                     className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)]"
                     min="1"
                   />
-                  <button
-                    onClick={handleSetvoteLimit}
-                    disabled={!newvoteLimit}
-                    className={cn(
-                      "rounded-md px-4 py-2 text-sm font-medium text-white",
-                      newvoteLimit
-                        ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
-                        : "bg-[var(--line)] cursor-not-allowed",
-                    )}
-                  >
+                  <Button onClick={handleSetvoteLimit} disabled={!newvoteLimit}>
                     Set Vote Count
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -730,18 +720,14 @@ function RetroBoard() {
                           Group ({group.tickets.length} tickets)
                         </div>
                         {session.voteLimit && (
-                          <button
+                          <Button
                             type="button"
                             onClick={() => handleVote(undefined, group._id)}
-                            className={cn(
-                              "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-                              hasVoted
-                                ? "bg-[var(--palm)] text-white hover:bg-red-600"
-                                : "bg-[var(--lagoon)] text-white hover:bg-[var(--lagoon-deep)]",
-                            )}
+                            size="sm"
+                            variant={hasVoted ? "reverse" : "default"}
                           >
                             {hasVoted ? "Withdraw" : "Vote"} ({group.voteLimit})
-                          </button>
+                          </Button>
                         )}
                       </div>
                       <div className="grid grid-cols-4 gap-3">
@@ -844,7 +830,7 @@ function RetroBoard() {
                           {item.voteLimit} votes
                         </div>
                         {isScrumMaster && !session.timerState && (
-                          <button
+                          <Button
                             type="button"
                             onClick={() =>
                               startTimer({
@@ -852,10 +838,10 @@ function RetroBoard() {
                                 duration: 300000, // 5 minutes
                               })
                             }
-                            className="rounded-md bg-[var(--lagoon)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--lagoon-deep)]"
+                            size="sm"
                           >
                             Start Timer
-                          </button>
+                          </Button>
                         )}
                       </div>
                       <div className="grid grid-cols-4 gap-3">
@@ -878,7 +864,7 @@ function RetroBoard() {
                         className="flex-1"
                       />
                       {isScrumMaster && !session.timerState && (
-                        <button
+                        <Button
                           type="button"
                           onClick={() =>
                             startTimer({
@@ -887,10 +873,11 @@ function RetroBoard() {
                               ticketId: item._id as Id<"tickets">,
                             })
                           }
-                          className="ml-4 rounded-md bg-[var(--lagoon)] px-3 py-1 text-xs font-medium text-white hover:bg-[var(--lagoon-deep)]"
+                          size="sm"
+                          className="ml-4"
                         >
                           Start Timer
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ) : null}
@@ -910,12 +897,9 @@ function RetroBoard() {
               <p className="mb-6 text-[var(--sea-ink-soft)]">
                 Sprint {session.sprintNumber} retrospective is complete
               </p>
-              <button
-                onClick={() => navigate({ to: "/retro" })}
-                className="rounded-md bg-[var(--lagoon)] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[var(--lagoon-deep)]"
-              >
+              <Button onClick={() => navigate({ to: "/retro" })}>
                 Back to Sessions
-              </button>
+              </Button>
             </div>
           </div>
         );
@@ -939,12 +923,9 @@ function RetroBoard() {
             </p>
           </div>
 
-          <button
-            onClick={() => navigate({ to: "/retro" })}
-            className="rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-4 py-2 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
-          >
+          <Button onClick={() => navigate({ to: "/retro" })} variant="neutral">
             ← Back
-          </button>
+          </Button>
         </div>
 
         {/* Main content with sidebar */}
@@ -1072,26 +1053,22 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
             required
           />
 
-          <button
+          <Button
             type="submit"
             disabled={!name.trim() || isJoining}
-            className={cn(
-              "w-full rounded-md px-4 py-3 text-sm font-medium text-white transition-colors",
-              name.trim() && !isJoining
-                ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
-                : "bg-[var(--line)] cursor-not-allowed",
-            )}
+            className="w-full"
           >
             {isJoining ? "Joining..." : "Join Session"}
-          </button>
+          </Button>
         </form>
 
-        <button
+        <Button
           onClick={() => navigate({ to: "/retro" })}
-          className="mt-4 w-full rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-4 py-2 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+          variant="neutral"
+          className="mt-4 w-full"
         >
           Back to Sessions
-        </button>
+        </Button>
       </div>
     </div>
   );

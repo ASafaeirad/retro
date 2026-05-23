@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "#lib/cn";
+import { Button } from "#ui/button.tsx";
 
 interface TimerProps {
   startedAt: number;
@@ -104,34 +105,31 @@ export function Timer({
       {/* Controls */}
       <div className="flex gap-2">
         {isPaused ? (
-          <button
-            onClick={onResume}
-            className="flex-1 rounded-md bg-[var(--lagoon)] px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-[var(--lagoon-deep)]"
-          >
+          <Button onClick={onResume} size="sm" className="flex-1">
             Resume
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             onClick={onPause}
-            className="flex-1 rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 text-xs font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+            variant="neutral"
+            size="sm"
+            className="flex-1"
           >
             Pause
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           onClick={() => onExtend(60000)} // Add 1 minute
-          className="rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 text-xs font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+          variant="neutral"
+          size="sm"
         >
           +1 min
-        </button>
+        </Button>
 
-        <button
-          onClick={onComplete}
-          className="rounded-md bg-[var(--palm)] px-3 py-2 text-xs font-medium text-white transition-colors hover:opacity-90"
-        >
+        <Button onClick={onComplete} variant="reverse" size="sm">
           Done
-        </button>
+        </Button>
       </div>
     </div>
   );
