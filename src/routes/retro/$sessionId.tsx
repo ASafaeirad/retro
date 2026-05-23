@@ -96,6 +96,9 @@ function RetroBoard() {
     null,
   );
   const [newvoteLimit, setNewvoteLimit] = useState("");
+  const [selectedParticipantFilter, setSelectedParticipantFilter] = useState<
+    string | null
+  >(null);
 
   // Get tickets sorted by votes (must be before early returns to satisfy Rules of Hooks)
   const ticketsByVotes = useMemo(() => {
@@ -505,9 +508,8 @@ function RetroBoard() {
       }
 
       case "PRESENT": {
-        const presenterTickets = session.currentPresenter
-          ? tickets.filter((t) => t.author === session.currentPresenter)
-          : [];
+        const wellTickets = tickets.filter((t) => t.category === "well");
+        const improveTickets = tickets.filter((t) => t.category === "improve");
 
         return (
           <div>
@@ -516,62 +518,53 @@ function RetroBoard() {
                 Present Tickets
               </h2>
               <p className="text-[var(--sea-ink-soft)]">
-                {session.currentPresenter
-                  ? `${session.currentPresenter} is presenting their tickets`
-                  : "Select a participant to present their tickets"}
+                {selectedParticipantFilter
+                  ? `Focusing on ${selectedParticipantFilter}'s tickets`
+                  : "Select a participant to focus on their tickets"}
               </p>
             </div>
 
-            {presenterTickets.length > 0 && (
-              <div className="mb-6 grid grid-cols-2 gap-6">
-                <BoardColumn title="What Went Well" category="well">
-                  {presenterTickets
-                    .filter((t) => t.category === "well")
-                    .map((ticket) => (
-                      <TicketCard
-                        id={ticket._id}
-                        key={ticket._id}
-                        {...ticket}
-                        isHighlighted
-                      />
-                    ))}
-                </BoardColumn>
+            <div className="grid grid-cols-2 gap-6">
+              <BoardColumn title="What Went Well" category="well">
+                {wellTickets.map((ticket) => (
+                  <TicketCard
+                    id={ticket._id}
+                    key={ticket._id}
+                    {...ticket}
+                    isHighlighted={
+                      selectedParticipantFilter
+                        ? ticket.author === selectedParticipantFilter
+                        : false
+                    }
+                    isDimmed={
+                      selectedParticipantFilter
+                        ? ticket.author !== selectedParticipantFilter
+                        : false
+                    }
+                  />
+                ))}
+              </BoardColumn>
 
-                <BoardColumn title="To Improve" category="improve">
-                  {presenterTickets
-                    .filter((t) => t.category === "improve")
-                    .map((ticket) => (
-                      <TicketCard
-                        id={ticket._id}
-                        key={ticket._id}
-                        {...ticket}
-                        isHighlighted
-                      />
-                    ))}
-                </BoardColumn>
-              </div>
-            )}
-
-            {/* All tickets dimmed */}
-            {session.currentPresenter && (
-              <div className="mt-8">
-                <h3 className="mb-4 text-sm font-semibold text-[var(--sea-ink-soft)]">
-                  Other Tickets
-                </h3>
-                <div className="grid grid-cols-4 gap-3">
-                  {tickets
-                    .filter((t) => t.author !== session.currentPresenter)
-                    .map((ticket) => (
-                      <TicketCard
-                        id={ticket._id}
-                        key={ticket._id}
-                        {...ticket}
-                        isDimmed
-                      />
-                    ))}
-                </div>
-              </div>
-            )}
+              <BoardColumn title="To Improve" category="improve">
+                {improveTickets.map((ticket) => (
+                  <TicketCard
+                    id={ticket._id}
+                    key={ticket._id}
+                    {...ticket}
+                    isHighlighted={
+                      selectedParticipantFilter
+                        ? ticket.author === selectedParticipantFilter
+                        : false
+                    }
+                    isDimmed={
+                      selectedParticipantFilter
+                        ? ticket.author !== selectedParticipantFilter
+                        : false
+                    }
+                  />
+                ))}
+              </BoardColumn>
+            </div>
           </div>
         );
       }
@@ -903,15 +896,15 @@ function RetroBoard() {
             <ParticipantList
               participants={participants}
               scrumMaster={session.createdBy}
-              currentPresenter={session.currentPresenter}
+              currentPresenter={selectedParticipantFilter || undefined}
               currentUserName={name}
               onSelectPresenter={
-                isScrumMaster && session.phase === "PRESENT"
-                  ? (name) =>
-                      setCurrentPresenter({
-                        sessionId: sessionId as Id<"sessions">,
-                        presenterName: name,
-                      })
+                session.phase === "PRESENT"
+                  ? (name) => {
+                      setSelectedParticipantFilter((prev) =>
+                        prev === name ? null : name,
+                      );
+                    }
                   : undefined
               }
               onLeaveSession={handleLeaveSession}
