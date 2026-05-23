@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react'
-import { cn } from '#lib/cn'
+import { useEffect, useState } from "react";
+import { cn } from "#lib/cn";
 
 interface TimerProps {
-  startedAt: number
-  duration: number // milliseconds
-  isPaused: boolean
-  pausedAt?: number
-  onPause: () => void
-  onResume: () => void
-  onExtend: (additionalTime: number) => void
-  onComplete: () => void
-  className?: string
+  startedAt: number;
+  duration: number; // milliseconds
+  isPaused: boolean;
+  pausedAt?: number;
+  onPause: () => void;
+  onResume: () => void;
+  onExtend: (additionalTime: number) => void;
+  onComplete: () => void;
+  className?: string;
 }
 
 export function Timer({
@@ -24,63 +24,69 @@ export function Timer({
   onComplete,
   className,
 }: TimerProps) {
-  const [timeRemaining, setTimeRemaining] = useState(0)
+  const [timeRemaining, setTimeRemaining] = useState(0);
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
       if (isPaused && pausedAt) {
-        const elapsed = pausedAt - startedAt
-        return Math.max(0, duration - elapsed)
+        const elapsed = pausedAt - startedAt;
+        return Math.max(0, duration - elapsed);
       }
-      const elapsed = Date.now() - startedAt
-      return Math.max(0, duration - elapsed)
-    }
+      const elapsed = Date.now() - startedAt;
+      return Math.max(0, duration - elapsed);
+    };
 
-    setTimeRemaining(calculateTimeRemaining())
+    setTimeRemaining(calculateTimeRemaining());
 
     if (!isPaused) {
       const interval = setInterval(() => {
-        const remaining = calculateTimeRemaining()
-        setTimeRemaining(remaining)
+        const remaining = calculateTimeRemaining();
+        setTimeRemaining(remaining);
 
         if (remaining === 0) {
-          clearInterval(interval)
+          clearInterval(interval);
         }
-      }, 100)
+      }, 100);
 
-      return () => clearInterval(interval)
+      return () => clearInterval(interval);
     }
-  }, [startedAt, duration, isPaused, pausedAt])
+  }, [startedAt, duration, isPaused, pausedAt]);
 
   const formatTime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000)
-    const minutes = Math.floor(totalSeconds / 60)
-    const seconds = totalSeconds % 60
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`
-  }
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
-  const percentage = (timeRemaining / duration) * 100
-  const isWarning = percentage <= 25 && percentage > 0
+  const percentage = (timeRemaining / duration) * 100;
+  const isWarning = percentage <= 25 && percentage > 0;
 
   return (
     <div
       className={cn(
-        'rounded-lg border-2 p-4',
-        isWarning ? 'border-[var(--destructive)] bg-red-50 dark:bg-red-950/20' : 'border-[var(--line)] bg-[var(--surface)]',
-        className
+        "rounded-lg border-2 p-4",
+        isWarning
+          ? "border-[var(--destructive)] bg-red-50 dark:bg-red-950/20"
+          : "border-[var(--line)] bg-[var(--surface)]",
+        className,
       )}
     >
       <div className="mb-3 text-center">
         <div
           className={cn(
-            'text-4xl font-bold tabular-nums',
-            isWarning ? 'text-[var(--destructive)]' : 'text-[var(--sea-ink)]'
+            "text-4xl font-bold tabular-nums",
+            isWarning ? "text-[var(--destructive)]" : "text-[var(--sea-ink)]",
           )}
         >
           {formatTime(timeRemaining)}
         </div>
         <div className="mt-1 text-xs text-[var(--sea-ink-soft)]">
-          {isPaused ? 'Paused' : timeRemaining === 0 ? 'Time\'s up!' : 'Remaining'}
+          {isPaused
+            ? "Paused"
+            : timeRemaining === 0
+              ? "Time's up!"
+              : "Remaining"}
         </div>
       </div>
 
@@ -88,8 +94,8 @@ export function Timer({
       <div className="mb-4 h-2 overflow-hidden rounded-full bg-[var(--line)]">
         <div
           className={cn(
-            'h-full transition-all duration-300',
-            isWarning ? 'bg-[var(--destructive)]' : 'bg-[var(--lagoon)]'
+            "h-full transition-all duration-300",
+            isWarning ? "bg-[var(--destructive)]" : "bg-[var(--lagoon)]",
           )}
           style={{ width: `${percentage}%` }}
         />
@@ -128,5 +134,5 @@ export function Timer({
         </button>
       </div>
     </div>
-  )
+  );
 }

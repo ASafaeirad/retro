@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import { cn } from '#lib/cn'
-import type { Id } from '../../../convex/_generated/dataModel'
+import { useState } from "react";
+import { cn } from "#lib/cn";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 interface ActionItem {
-  _id: Id<'actionItems'>
-  text: string
-  assignee?: string
-  completed: boolean
-  completedAt?: number
+  _id: Id<"actionItems">;
+  text: string;
+  assignee?: string;
+  completed: boolean;
+  completedAt?: number;
 }
 
 interface ActionItemPanelProps {
-  actionItems: ActionItem[]
-  participants: { name: string }[]
-  onToggleComplete?: (id: Id<'actionItems'>) => void
-  onCreateActionItem?: (text: string, assignee?: string) => void
-  isCreating?: boolean
-  className?: string
+  actionItems: ActionItem[];
+  participants: { name: string }[];
+  onToggleComplete?: (id: Id<"actionItems">) => void;
+  onCreateActionItem?: (text: string, assignee?: string) => void;
+  isCreating?: boolean;
+  className?: string;
 }
 
 export function ActionItemPanel({
@@ -27,21 +27,26 @@ export function ActionItemPanel({
   isCreating = false,
   className,
 }: ActionItemPanelProps) {
-  const [isAdding, setIsAdding] = useState(false)
-  const [newText, setNewText] = useState('')
-  const [newAssignee, setNewAssignee] = useState('')
+  const [isAdding, setIsAdding] = useState(false);
+  const [newText, setNewText] = useState("");
+  const [newAssignee, setNewAssignee] = useState("");
 
   const handleCreate = () => {
     if (newText.trim() && onCreateActionItem) {
-      onCreateActionItem(newText.trim(), newAssignee || undefined)
-      setNewText('')
-      setNewAssignee('')
-      setIsAdding(false)
+      onCreateActionItem(newText.trim(), newAssignee || undefined);
+      setNewText("");
+      setNewAssignee("");
+      setIsAdding(false);
     }
-  }
+  };
 
   return (
-    <div className={cn('rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4', className)}>
+    <div
+      className={cn(
+        "rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4",
+        className,
+      )}
+    >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-[var(--sea-ink)]">
           Action Items ({actionItems.length})
@@ -63,8 +68,8 @@ export function ActionItemPanel({
           <div
             key={item._id}
             className={cn(
-              'rounded-md border border-[var(--line)] bg-[var(--chip-bg)] p-3 transition-colors',
-              item.completed && 'opacity-60'
+              "rounded-md border border-[var(--line)] bg-[var(--chip-bg)] p-3 transition-colors",
+              item.completed && "opacity-60",
             )}
           >
             <div className="flex items-start gap-2">
@@ -72,22 +77,37 @@ export function ActionItemPanel({
                 <button
                   onClick={() => onToggleComplete(item._id)}
                   className={cn(
-                    'mt-0.5 h-4 w-4 flex-shrink-0 rounded border-2 transition-colors',
+                    "mt-0.5 h-4 w-4 flex-shrink-0 rounded border-2 transition-colors",
                     item.completed
-                      ? 'border-[var(--lagoon)] bg-[var(--lagoon)]'
-                      : 'border-[var(--line)] bg-transparent'
+                      ? "border-[var(--lagoon)] bg-[var(--lagoon)]"
+                      : "border-[var(--line)] bg-transparent",
                   )}
                 >
                   {item.completed && (
-                    <svg className="h-full w-full text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="h-full w-full text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
                 </button>
               )}
 
               <div className="flex-1">
-                <p className={cn('text-sm text-[var(--sea-ink)]', item.completed && 'line-through')}>
+                <p
+                  className={cn(
+                    "text-sm text-[var(--sea-ink)]",
+                    item.completed && "line-through",
+                  )}
+                >
                   {item.text}
                 </p>
                 {item.assignee && (
@@ -137,19 +157,19 @@ export function ActionItemPanel({
               onClick={handleCreate}
               disabled={!newText.trim() || isCreating}
               className={cn(
-                'flex-1 rounded-md px-3 py-2 text-xs font-medium text-white transition-colors',
+                "flex-1 rounded-md px-3 py-2 text-xs font-medium text-white transition-colors",
                 newText.trim() && !isCreating
-                  ? 'bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]'
-                  : 'bg-[var(--line)] cursor-not-allowed'
+                  ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
+                  : "bg-[var(--line)] cursor-not-allowed",
               )}
             >
-              {isCreating ? 'Creating...' : 'Create'}
+              {isCreating ? "Creating..." : "Create"}
             </button>
             <button
               onClick={() => {
-                setIsAdding(false)
-                setNewText('')
-                setNewAssignee('')
+                setIsAdding(false);
+                setNewText("");
+                setNewAssignee("");
               }}
               className="rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 text-xs font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
             >
@@ -159,5 +179,5 @@ export function ActionItemPanel({
         </div>
       )}
     </div>
-  )
+  );
 }

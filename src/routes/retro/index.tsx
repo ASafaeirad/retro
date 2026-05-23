@@ -1,77 +1,85 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQuery, useMutation } from 'convex/react'
-import { api } from '#convex/api'
-import { useState } from 'react'
-import { cn } from '#lib/cn'
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery } from "convex/react";
+import { useState } from "react";
+import { api } from "#convex/api";
+import { cn } from "#lib/cn";
 
-export const Route = createFileRoute('/retro/')({
+export const Route = createFileRoute("/retro/")({
   component: RetroSessionsPage,
-})
+});
 
 function RetroSessionsPage() {
-  const navigate = useNavigate()
-  const sessions = useQuery(api.retro.listSessions, { includeCompleted: true })
-  const createSession = useMutation(api.retro.createSession)
-  const joinSession = useMutation(api.retro.joinSession)
+  const navigate = useNavigate();
+  const sessions = useQuery(api.retro.listSessions, { includeCompleted: true });
+  const createSession = useMutation(api.retro.createSession);
+  const joinSession = useMutation(api.retro.joinSession);
 
-  const [isCreating, setIsCreating] = useState(false)
-  const [sprintNumber, setSprintNumber] = useState('')
-  const [creatorName, setCreatorName] = useState('')
+  const [isCreating, setIsCreating] = useState(false);
+  const [sprintNumber, setSprintNumber] = useState("");
+  const [creatorName, setCreatorName] = useState("");
 
-  const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null)
-  const [joinName, setJoinName] = useState('')
+  const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
+  const [joinName, setJoinName] = useState("");
 
   const handleCreateSession = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!sprintNumber || !creatorName.trim()) return
+    e.preventDefault();
+    if (!sprintNumber || !creatorName.trim()) return;
 
     try {
       const sessionId = await createSession({
         sprintNumber: Number(sprintNumber),
         creatorName: creatorName.trim(),
-      })
+      });
 
       // Navigate to the new session
-      navigate({ to: `/retro/${sessionId}`, search: { name: creatorName.trim() } })
+      navigate({
+        to: `/retro/${sessionId}`,
+        search: { name: creatorName.trim() },
+      });
     } catch (error) {
-      console.error('Failed to create session:', error)
-      alert('Failed to create session. Please try again.')
+      console.error("Failed to create session:", error);
+      alert("Failed to create session. Please try again.");
     }
-  }
+  };
 
   const handleJoinSession = async (sessionId: string) => {
-    if (!joinName.trim()) return
+    if (!joinName.trim()) return;
 
     try {
       await joinSession({
         sessionId: sessionId as any,
         name: joinName.trim(),
-      })
+      });
 
       // Navigate to the session
-      navigate({ to: `/retro/${sessionId}`, search: { name: joinName.trim() } })
+      navigate({
+        to: `/retro/${sessionId}`,
+        search: { name: joinName.trim() },
+      });
     } catch (error) {
-      console.error('Failed to join session:', error)
-      alert('Failed to join session. Name might already be taken.')
+      console.error("Failed to join session:", error);
+      alert("Failed to join session. Name might already be taken.");
     }
-  }
+  };
 
   if (sessions === undefined) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
         <div className="text-[var(--sea-ink)]">Loading sessions...</div>
       </div>
-    )
+    );
   }
 
-  const activeSessions = sessions.filter((s) => s.isActive)
-  const completedSessions = sessions.filter((s) => !s.isActive)
+  const activeSessions = sessions.filter((s) => s.isActive);
+  const completedSessions = sessions.filter((s) => !s.isActive);
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] py-8 px-4">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--sea-ink)]">Retro Board</h1>
+          <h1 className="text-3xl font-bold text-[var(--sea-ink)]">
+            Retro Board
+          </h1>
           <p className="mt-2 text-[var(--sea-ink-soft)]">
             Create or join a retrospective session
           </p>
@@ -81,6 +89,7 @@ function RetroSessionsPage() {
         <div className="mb-8 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
           {!isCreating ? (
             <button
+              type="button"
               onClick={() => setIsCreating(true)}
               className="w-full rounded-md bg-[var(--lagoon)] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[var(--lagoon-deep)]"
             >
@@ -89,7 +98,10 @@ function RetroSessionsPage() {
           ) : (
             <form onSubmit={handleCreateSession} className="space-y-4">
               <div>
-                <label htmlFor="sprintNumber" className="block text-sm font-medium text-[var(--sea-ink)] mb-2">
+                <label
+                  htmlFor="sprintNumber"
+                  className="block text-sm font-medium text-[var(--sea-ink)] mb-2"
+                >
                   Sprint Number
                 </label>
                 <input
@@ -105,7 +117,10 @@ function RetroSessionsPage() {
               </div>
 
               <div>
-                <label htmlFor="creatorName" className="block text-sm font-medium text-[var(--sea-ink)] mb-2">
+                <label
+                  htmlFor="creatorName"
+                  className="block text-sm font-medium text-[var(--sea-ink)] mb-2"
+                >
                   Your Name (you'll be the Scrum Master)
                 </label>
                 <input
@@ -129,9 +144,9 @@ function RetroSessionsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    setIsCreating(false)
-                    setSprintNumber('')
-                    setCreatorName('')
+                    setIsCreating(false);
+                    setSprintNumber("");
+                    setCreatorName("");
                   }}
                   className="rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-4 py-2 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
                 >
@@ -160,7 +175,8 @@ function RetroSessionsPage() {
                         Sprint {session.sprintNumber}
                       </h3>
                       <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                        Phase: {session.phase.replace('_', ' ')} • {session.participantCount} participants
+                        Phase: {session.phase.replace("_", " ")} •{" "}
+                        {session.participantCount} participants
                       </p>
                       <p className="text-xs text-[var(--sea-ink-soft)] mt-1">
                         Scrum Master: {session.createdBy}
@@ -177,8 +193,8 @@ function RetroSessionsPage() {
                           className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
                           autoFocus
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              handleJoinSession(session._id)
+                            if (e.key === "Enter") {
+                              handleJoinSession(session._id);
                             }
                           }}
                         />
@@ -186,18 +202,18 @@ function RetroSessionsPage() {
                           onClick={() => handleJoinSession(session._id)}
                           disabled={!joinName.trim()}
                           className={cn(
-                            'rounded-md px-4 py-2 text-sm font-medium text-white transition-colors',
+                            "rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
                             joinName.trim()
-                              ? 'bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]'
-                              : 'bg-[var(--line)] cursor-not-allowed'
+                              ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
+                              : "bg-[var(--line)] cursor-not-allowed",
                           )}
                         >
                           Join
                         </button>
                         <button
                           onClick={() => {
-                            setJoiningSessionId(null)
-                            setJoinName('')
+                            setJoiningSessionId(null);
+                            setJoinName("");
                           }}
                           className="rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
                         >
@@ -263,5 +279,5 @@ function RetroSessionsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

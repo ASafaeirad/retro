@@ -1,41 +1,47 @@
-import { useState } from 'react'
-import { cn } from '#lib/cn'
+import { useState } from "react";
+import { cn } from "#lib/cn";
 
 interface AddTicketFormProps {
-  category: 'well' | 'improve'
-  onSubmit: (text: string, imageUrl?: string) => void
-  onCancel?: () => void
-  isSubmitting?: boolean
-  className?: string
+  category: "well" | "improve";
+  onSubmit: (text: string, imageUrl?: string) => void;
+  onCancel?: () => void;
+  isSubmitting?: boolean;
+  className?: string;
 }
 
-export function AddTicketForm({ category, onSubmit, onCancel, isSubmitting, className }: AddTicketFormProps) {
-  const [text, setText] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
+export function AddTicketForm({
+  category,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+  className,
+}: AddTicketFormProps) {
+  const [text, setText] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (text.trim()) {
-      onSubmit(text.trim(), imageUrl.trim() || undefined)
-      setText('')
-      setImageUrl('')
+      onSubmit(text.trim(), imageUrl.trim() || undefined);
+      setText("");
+      setImageUrl("");
     }
-  }
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
       className={cn(
-        'rounded-lg border-2 bg-[var(--surface)] p-4',
-        category === 'well' && 'border-[var(--lagoon-deep)]',
-        category === 'improve' && 'border-[var(--palm)]',
-        className
+        "rounded-lg border-2 bg-[var(--surface)] p-4",
+        category === "well" && "border-[var(--lagoon-deep)]",
+        category === "improve" && "border-[var(--palm)]",
+        className,
       )}
     >
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={`What ${category === 'well' ? 'went well' : 'could be improved'}?`}
+        placeholder={`What ${category === "well" ? "went well" : "could be improved"}?`}
         className="mb-2 w-full resize-none rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
         rows={3}
         autoFocus
@@ -56,13 +62,13 @@ export function AddTicketForm({ category, onSubmit, onCancel, isSubmitting, clas
           type="submit"
           disabled={!text.trim() || isSubmitting}
           className={cn(
-            'flex-1 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors',
+            "flex-1 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors",
             text.trim() && !isSubmitting
-              ? 'bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]'
-              : 'bg-[var(--line)] cursor-not-allowed'
+              ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
+              : "bg-[var(--line)] cursor-not-allowed",
           )}
         >
-          {isSubmitting ? 'Adding...' : 'Add Ticket'}
+          {isSubmitting ? "Adding..." : "Add Ticket"}
         </button>
 
         {onCancel && (
@@ -77,5 +83,5 @@ export function AddTicketForm({ category, onSubmit, onCancel, isSubmitting, clas
         )}
       </div>
     </form>
-  )
+  );
 }
