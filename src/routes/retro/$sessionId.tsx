@@ -10,6 +10,7 @@ import { ActionItemPanel } from "#components/retro/ActionItemPanel.tsx";
 import { AddTicketForm } from "#components/retro/AddTicketForm.tsx";
 import { BoardColumn } from "#components/retro/BoardColumn.tsx";
 import { DraggableTicketCard } from "#components/retro/DraggableTicketCard.tsx";
+import { EditTicketForm } from "#components/retro/EditTicketForm.tsx";
 import { ParticipantList } from "#components/retro/ParticipantList.tsx";
 import { PhaseControls } from "#components/retro/PhaseControls.tsx";
 import { TicketCard } from "#components/retro/TicketCard.tsx";
@@ -67,6 +68,8 @@ function RetroBoard() {
   const updatePhase = useMutation(api.retro.updatePhase);
   const toggleReady = useMutation(api.retro.toggleReady);
   const addTicket = useMutation(api.retro.addTicket);
+  const updateTicket = useMutation(api.retro.updateTicket);
+  const deleteTicket = useMutation(api.retro.deleteTicket);
   const setCurrentPresenter = useMutation(api.retro.setCurrentPresenter);
   const createGroup = useMutation(api.retro.createGroup);
   const addTicketToGroup = useMutation(api.retro.addTicketToGroup);
@@ -89,6 +92,9 @@ function RetroBoard() {
   const [addingTicketCategory, setAddingTicketCategory] = useState<
     "well" | "improve" | null
   >(null);
+  const [editingTicketId, setEditingTicketId] = useState<Id<"tickets"> | null>(
+    null,
+  );
   const [newvoteLimit, setNewvoteLimit] = useState("");
 
   // Get tickets sorted by votes (must be before early returns to satisfy Rules of Hooks)
@@ -195,6 +201,43 @@ function RetroBoard() {
       imageUrl,
     });
     setAddingTicketCategory(null);
+  };
+
+  // Edit ticket
+  const handleEditTicket = async (text: string, imageUrl?: string) => {
+    if (!name || !editingTicketId) return;
+    try {
+      await updateTicket({
+        ticketId: editingTicketId,
+        text,
+        imageUrl,
+        author: name,
+      });
+      setEditingTicketId(null);
+    } catch (error) {
+      console.error("Failed to edit ticket:", error);
+      alert("Failed to edit ticket. Please try again.");
+    }
+  };
+
+  // Delete ticket
+  const handleDeleteTicket = async (ticketId: Id<"tickets">) => {
+    if (!name) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this ticket?",
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteTicket({
+        ticketId,
+        author: name,
+      });
+    } catch (error) {
+      console.error("Failed to delete ticket:", error);
+      alert("Failed to delete ticket. Please try again.");
+    }
   };
 
   // Leave session
@@ -380,9 +423,27 @@ function RetroBoard() {
 
             <div className="grid grid-cols-2 gap-6">
               <BoardColumn title="What Went Well" category="well">
-                {wellTickets.map((ticket) => (
-                  <TicketCard id={ticket._id} key={ticket._id} {...ticket} />
-                ))}
+                {wellTickets.map((ticket) =>
+                  editingTicketId === ticket._id ? (
+                    <EditTicketForm
+                      key={ticket._id}
+                      initialText={ticket.text}
+                      initialImageUrl={ticket.imageUrl}
+                      category="well"
+                      onSubmit={handleEditTicket}
+                      onCancel={() => setEditingTicketId(null)}
+                    />
+                  ) : (
+                    <TicketCard
+                      id={ticket._id}
+                      key={ticket._id}
+                      {...ticket}
+                      currentUserName={name}
+                      onEdit={() => setEditingTicketId(ticket._id)}
+                      onDelete={() => handleDeleteTicket(ticket._id)}
+                    />
+                  ),
+                )}
 
                 {addingTicketCategory === "well" ? (
                   <AddTicketForm
@@ -401,9 +462,27 @@ function RetroBoard() {
               </BoardColumn>
 
               <BoardColumn title="To Improve" category="improve">
-                {improveTickets.map((ticket) => (
-                  <TicketCard id={ticket._id} key={ticket._id} {...ticket} />
-                ))}
+                {improveTickets.map((ticket) =>
+                  editingTicketId === ticket._id ? (
+                    <EditTicketForm
+                      key={ticket._id}
+                      initialText={ticket.text}
+                      initialImageUrl={ticket.imageUrl}
+                      category="improve"
+                      onSubmit={handleEditTicket}
+                      onCancel={() => setEditingTicketId(null)}
+                    />
+                  ) : (
+                    <TicketCard
+                      id={ticket._id}
+                      key={ticket._id}
+                      {...ticket}
+                      currentUserName={name}
+                      onEdit={() => setEditingTicketId(ticket._id)}
+                      onDelete={() => handleDeleteTicket(ticket._id)}
+                    />
+                  ),
+                )}
 
                 {addingTicketCategory === "improve" ? (
                   <AddTicketForm
@@ -735,13 +814,18 @@ function RetroBoard() {
                             key={ticket._id}
                             {...ticket}
                             isGrouped
+                            voteLimit={0}
                           />
                         ))}
                       </div>
                     </div>
-                  ) : (
+                  ) : item.type === "ticket" ? (
                     <div className="flex items-start justify-between">
-                      <TicketCard id={item._id} {...item} className="flex-1" />
+                      <TicketCard
+                        id={item._id as Id<"tickets">}
+                        {...item}
+                        className="flex-1"
+                      />
                       {isScrumMaster && !session.timerState && (
                         <button
                           type="button"
@@ -758,7 +842,7 @@ function RetroBoard() {
                         </button>
                       )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -840,11 +924,6 @@ function RetroBoard() {
               <PhaseControls
                 currentPhase={session.phase}
                 onPhaseChange={handlePhaseChange}
-                canAdvance={
-                  session.phase === "ADD_TICKETS"
-                    ? participants.every((p) => p.isReady)
-                    : true
-                }
               />
             )}
 

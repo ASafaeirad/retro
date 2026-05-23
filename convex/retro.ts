@@ -267,6 +267,62 @@ export const addTicket = mutation({
   },
 })
 
+export const updateTicket = mutation({
+  args: {
+    ticketId: v.id('tickets'),
+    text: v.string(),
+    imageUrl: v.optional(v.string()),
+    author: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const ticket = await ctx.db.get(args.ticketId)
+    if (!ticket) {
+      throw new Error('Ticket not found')
+    }
+
+    // Verify the author is updating their own ticket
+    if (ticket.author !== args.author) {
+      throw new Error('You can only edit your own tickets')
+    }
+
+    await ctx.db.patch(args.ticketId, {
+      text: args.text,
+      imageUrl: args.imageUrl,
+    })
+  },
+})
+
+export const deleteTicket = mutation({
+  args: {
+    ticketId: v.id('tickets'),
+    author: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const ticket = await ctx.db.get(args.ticketId)
+    if (!ticket) {
+      throw new Error('Ticket not found')
+    }
+
+    // Verify the author is deleting their own ticket
+    if (ticket.author !== args.author) {
+      throw new Error('You can only delete your own tickets')
+    }
+
+    // Delete associated votes
+    const votes = await ctx.db
+      .query('votes')
+      .withIndex('ticketId', (q) => q.eq('ticketId', args.ticketId))
+      .collect()
+
+    for (const vote of votes) {
+      await ctx.db.delete(vote._id)
+    }
+
+    // Delete the ticket
+    await ctx.db.delete(args.ticketId)
+  },
+})
+
 export const updatePhase = mutation({
   args: {
     sessionId: v.id('sessions'),
