@@ -74,10 +74,10 @@ function RetroSessionsPage() {
     }
   };
 
-  if (sessions === undefined) {
+  if (!sessions) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
-        <div className="text-[var(--sea-ink)]">Loading sessions...</div>
+      <div className="grid text-center min-h-screen items-center justify-center]">
+        Loading sessions...
       </div>
     );
   }
