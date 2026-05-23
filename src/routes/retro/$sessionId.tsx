@@ -324,30 +324,38 @@ function RetroBoard() {
     }
   };
 
-  // Handle voting
+  // Handle voting (toggle: vote if not voted, withdraw if already voted)
   const handleVote = async (
     ticketId?: Id<"tickets">,
     groupId?: Id<"ticketGroups">,
   ) => {
     if (!name) return;
 
+    // Check if user has already voted on this ticket/group
+    const existingVote = myVotes?.find((vote) =>
+      ticketId ? vote.ticketId === ticketId : vote.groupId === groupId,
+    );
+
+    if (existingVote) {
+      // Withdraw vote
+      await removeVote({ voteId: existingVote._id });
+      return;
+    }
+
+    // Check vote limit before casting new vote
     const votesLeft = (session.voteLimit || 0) - (myVotes?.length || 0);
     if (votesLeft <= 0) {
       alert("You have used all your votes!");
       return;
     }
 
+    // Cast new vote
     await castVote({
       sessionId: sessionId as Id<"sessions">,
       participantName: name,
       ticketId,
       groupId,
     });
-  };
-
-  // Remove vote
-  const handleRemoveVote = async (voteId: Id<"votes">) => {
-    await removeVote({ voteId });
   };
 
   // Set vote count
@@ -669,43 +677,48 @@ function RetroBoard() {
             {/* Groups with votes */}
             {ticketGroups && ticketGroups.length > 0 && (
               <div className="mb-6 space-y-4">
-                {ticketGroups.map((group) => (
-                  <div
-                    key={group._id}
-                    className="rounded-lg border-2 border-[var(--palm)] bg-[var(--surface)] p-4"
-                  >
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="text-sm font-semibold text-[var(--sea-ink)]">
-                        Group ({group.tickets.length} tickets)
+                {ticketGroups.map((group) => {
+                  const hasVoted = myVotes?.some(
+                    (vote) => vote.groupId === group._id,
+                  );
+                  return (
+                    <div
+                      key={group._id}
+                      className="rounded-lg border-2 border-[var(--palm)] bg-[var(--surface)] p-4"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <div className="text-sm font-semibold text-[var(--sea-ink)]">
+                          Group ({group.tickets.length} tickets)
+                        </div>
+                        {session.voteLimit && (
+                          <button
+                            type="button"
+                            onClick={() => handleVote(undefined, group._id)}
+                            className={cn(
+                              "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                              hasVoted
+                                ? "bg-[var(--palm)] text-white hover:bg-red-600"
+                                : "bg-[var(--lagoon)] text-white hover:bg-[var(--lagoon-deep)]",
+                            )}
+                          >
+                            {hasVoted ? "Withdraw" : "Vote"} ({group.voteLimit})
+                          </button>
+                        )}
                       </div>
-                      {session.voteLimit && (
-                        <button
-                          onClick={() => handleVote(undefined, group._id)}
-                          disabled={votesLeft <= 0}
-                          className={cn(
-                            "rounded-md px-3 py-1 text-xs font-medium text-white",
-                            votesLeft > 0
-                              ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
-                              : "bg-[var(--line)] cursor-not-allowed",
-                          )}
-                        >
-                          Vote ({group.voteLimit})
-                        </button>
-                      )}
+                      <div className="grid grid-cols-4 gap-3">
+                        {group.tickets.map((ticket) => (
+                          <TicketCard
+                            id={ticket._id}
+                            key={ticket._id}
+                            {...ticket}
+                            voteLimit={group.voteLimit}
+                            isGrouped
+                          />
+                        ))}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-4 gap-3">
-                      {group.tickets.map((ticket) => (
-                        <TicketCard
-                          id={ticket._id}
-                          key={ticket._id}
-                          {...ticket}
-                          voteLimit={group.voteLimit}
-                          isGrouped
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -713,18 +726,24 @@ function RetroBoard() {
             <div className="grid grid-cols-4 gap-3">
               {tickets
                 .filter((t) => !t.groupId)
-                .map((ticket) => (
-                  <TicketCard
-                    key={ticket._id}
-                    {...ticket}
-                    id={ticket._id}
-                    onVote={
-                      session.voteLimit && votesLeft > 0
-                        ? () => handleVote(ticket._id)
-                        : undefined
-                    }
-                  />
-                ))}
+                .map((ticket) => {
+                  const hasVoted = myVotes?.some(
+                    (vote) => vote.ticketId === ticket._id,
+                  );
+                  return (
+                    <TicketCard
+                      key={ticket._id}
+                      {...ticket}
+                      id={ticket._id}
+                      hasVoted={hasVoted}
+                      onVote={
+                        session.voteLimit
+                          ? () => handleVote(ticket._id)
+                          : undefined
+                      }
+                    />
+                  );
+                })}
             </div>
           </div>
         );

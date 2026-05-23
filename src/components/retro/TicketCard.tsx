@@ -11,6 +11,7 @@ interface TicketCardProps {
   isHighlighted?: boolean;
   isDimmed?: boolean;
   isGrouped?: boolean;
+  hasVoted?: boolean; // Whether the current user has voted on this ticket
   onClick?: () => void;
   onVote?: () => void;
   onEdit?: () => void;
@@ -28,6 +29,7 @@ export function TicketCard({
   isHighlighted = false,
   isDimmed = false,
   isGrouped = false,
+  hasVoted = false,
   onClick,
   onVote,
   onEdit,
@@ -149,9 +151,14 @@ export function TicketCard({
               e.stopPropagation();
               onVote();
             }}
-            className="rounded-md bg-[var(--lagoon)] px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-[var(--lagoon-deep)]"
+            className={cn(
+              "rounded-md px-3 py-1 text-xs font-medium text-white transition-colors",
+              hasVoted
+                ? "bg-[var(--palm)] hover:bg-red-600"
+                : "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]",
+            )}
           >
-            Vote
+            {hasVoted ? "Withdraw" : "Vote"}
           </button>
         )}
       </div>
