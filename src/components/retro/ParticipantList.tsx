@@ -1,4 +1,9 @@
+import { useConvexMutation } from "@convex-dev/react-query";
+import { useState } from "react";
+import { Avatar, AvatarFallback } from "#components/ui/avatar.tsx";
+import { api } from "#convex/api";
 import { cn } from "#lib/cn";
+import { allMoods, type Mood, moodEmojis, toMood } from "#models/mood.model.ts";
 import { Button } from "#ui/button.tsx";
 import type { Id } from "../../../convex/_generated/dataModel";
 
@@ -7,6 +12,7 @@ interface Participant {
   name: string;
   isReady: boolean;
   lastActiveAt: number;
+  mood?: Mood;
 }
 
 interface ParticipantListProps {
@@ -14,6 +20,7 @@ interface ParticipantListProps {
   scrumMaster: string;
   currentPresenter?: string;
   currentUserName?: string;
+  sessionId: Id<"sessions">;
   onSelectPresenter?: (name: string) => void;
   onLeaveSession?: () => void;
   onRemoveParticipant?: (participantId: Id<"participants">) => void;
@@ -31,21 +38,28 @@ export function ParticipantList({
   scrumMaster,
   currentPresenter,
   currentUserName,
+  sessionId,
   onSelectPresenter,
   onLeaveSession,
   onRemoveParticipant,
   className,
 }: ParticipantListProps) {
   const isScrumMaster = currentUserName === scrumMaster;
+  const updateMood = useConvexMutation(api.retro.updateParticipantMood);
+  const [editingMoodFor, setEditingMoodFor] = useState<string | null>(null);
+
+  const handleMoodChange = async (participantName: string, mood?: string) => {
+    try {
+      await updateMood({ sessionId, participantName, mood });
+      setEditingMoodFor(null);
+    } catch (error) {
+      console.error("Failed to update mood:", error);
+    }
+  };
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4",
-        className,
-      )}
-    >
-      <h3 className="mb-3 text-sm font-semibold text-[var(--sea-ink)]">
+    <div className={cn("rounded-lg border p-4", className)}>
+      <h3 className="mb-3 text-sm font-semibold">
         Participants ({participants.length})
       </h3>
 
@@ -53,6 +67,7 @@ export function ParticipantList({
         {participants.map((participant) => {
           const isActive = isParticipantActive(participant.lastActiveAt);
           const isCurrentUser = participant.name === currentUserName;
+          const mood = toMood(participant.mood);
 
           return (
             <div
@@ -81,26 +96,91 @@ export function ParticipantList({
                 />
 
                 <div className="flex flex-col">
-                  <span
-                    className={cn(
-                      "text-sm",
-                      isActive
-                        ? "text-[var(--sea-ink)]"
-                        : "text-[var(--sea-ink-soft)]",
+                  <div className="flex items-center gap-1">
+                    {/* Mood emoji - clickable for current user */}
+                    {isCurrentUser && editingMoodFor === participant.name ? (
+                      <div className="flex gap-1">
+                        {allMoods.map((option) => (
+                          <Button
+                            key={option}
+                            type="button"
+                            variant="neutral"
+                            size="sm"
+                            onClick={() =>
+                              handleMoodChange(participant.name, option)
+                            }
+                            title={option}
+                          >
+                            {moodEmojis[option]}
+                          </Button>
+                        ))}
+                        {participant.mood && (
+                          <Button
+                            type="button"
+                            variant="neutral"
+                            size="sm"
+                            onClick={() =>
+                              handleMoodChange(participant.name, undefined)
+                            }
+                            title="Remove mood"
+                          >
+                            ✕
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <Avatar
+                          className={cn({ "cursor-pointer": isCurrentUser })}
+                          onClick={() => {
+                            if (!isCurrentUser) return;
+                            setEditingMoodFor(participant.name);
+                          }}
+                          title={
+                            isCurrentUser
+                              ? "Click to change mood"
+                              : "Previous sprint mood"
+                          }
+                        >
+                          <AvatarFallback>{moodEmojis[mood]}</AvatarFallback>
+                        </Avatar>
+                        <span
+                          className={cn(
+                            "text-sm",
+                            isActive
+                              ? "text-[var(--sea-ink)]"
+                              : "text-[var(--sea-ink-soft)]",
+                            isCurrentUser &&
+                              !participant.mood &&
+                              "cursor-pointer hover:opacity-70",
+                          )}
+                          onClick={(e) => {
+                            if (isCurrentUser && !participant.mood) {
+                              e.stopPropagation();
+                              setEditingMoodFor(participant.name);
+                            }
+                          }}
+                          title={
+                            isCurrentUser && !participant.mood
+                              ? "Click to add mood"
+                              : undefined
+                          }
+                        >
+                          {participant.name}
+                          {participant.name === scrumMaster && (
+                            <span className="ml-2 text-xs text-[var(--kicker)] font-medium">
+                              (SM)
+                            </span>
+                          )}
+                          {isCurrentUser && (
+                            <span className="ml-2 text-xs text-[var(--sea-ink-soft)] font-medium">
+                              (You)
+                            </span>
+                          )}
+                        </span>
+                      </>
                     )}
-                  >
-                    {participant.name}
-                    {participant.name === scrumMaster && (
-                      <span className="ml-2 text-xs text-[var(--kicker)] font-medium">
-                        (SM)
-                      </span>
-                    )}
-                    {isCurrentUser && (
-                      <span className="ml-2 text-xs text-[var(--sea-ink-soft)] font-medium">
-                        (You)
-                      </span>
-                    )}
-                  </span>
+                  </div>
                   {!isActive && (
                     <span className="text-xs text-[var(--sea-ink-soft)]">
                       Disconnected

@@ -47,6 +47,7 @@ export default defineSchema({
     joinedAt: v.number(),
     sessionToken: v.optional(v.string()),
     lastActiveAt: v.number(),
+    mood: v.optional(v.string()),
   })
     .index('sessionId', ['sessionId'])
     .index('sessionAndName', ['sessionId', 'name'])

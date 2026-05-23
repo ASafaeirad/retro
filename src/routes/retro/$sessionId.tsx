@@ -15,12 +15,14 @@ import { AddTicketForm } from "#components/retro/AddTicketForm.tsx";
 import { BoardColumn } from "#components/retro/BoardColumn.tsx";
 import { DraggableTicketCard } from "#components/retro/DraggableTicketCard.tsx";
 import { EditTicketForm } from "#components/retro/EditTicketForm.tsx";
+import { MoodSelector } from "#components/retro/MoodSelector.tsx";
 import { ParticipantList } from "#components/retro/ParticipantList.tsx";
 import { PhaseControls } from "#components/retro/PhaseControls.tsx";
 import { TicketCard } from "#components/retro/TicketCard.tsx";
 import { Timer } from "#components/retro/Timer.tsx";
 import { api } from "#convex/api";
 import { cn } from "#lib/cn";
+import type { Mood } from "#models/mood.model.ts";
 import { Button } from "#ui/button.tsx";
 import type { Id } from "../../../convex/_generated/dataModel";
 import {
@@ -937,6 +939,7 @@ function RetroBoard() {
               scrumMaster={session.createdBy}
               currentPresenter={selectedParticipantFilter || undefined}
               currentUserName={name}
+              sessionId={sessionId as Id<"sessions">}
               onSelectPresenter={
                 session.phase === "PRESENT"
                   ? (name) => {
@@ -994,6 +997,7 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
   const navigate = useNavigate();
   const joinSession = useMutation(api.retro.joinSession);
   const [name, setName] = useState("");
+  const [mood, setMood] = useState<Mood>();
   const [isJoining, setIsJoining] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1006,15 +1010,16 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
       const stored = getStoredSession(sessionId);
       const token = stored?.token || generateToken();
 
-      // Call joinSession mutation with token
+      // Call joinSession mutation with token and mood
       await joinSession({
         sessionId,
         name: name.trim(),
         sessionToken: token,
+        mood,
       });
 
       // Store session credentials in localStorage
-      storeSession(sessionId, name.trim(), token);
+      storeSession(sessionId, name.trim(), token, mood);
 
       // Navigate to the session
       navigate({
@@ -1052,7 +1057,7 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
             autoFocus
             required
           />
-
+          <MoodSelector value={mood} onChange={setMood} />
           <Button
             type="submit"
             disabled={!name.trim() || isJoining}

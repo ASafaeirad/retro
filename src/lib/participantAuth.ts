@@ -1,9 +1,11 @@
+import type { Mood } from "#models/mood.model.ts";
 import type { Id } from "../../convex/_generated/dataModel";
 
 interface StoredSession {
   name: string;
   token: string;
   joinedAt: number;
+  mood?: Mood;
 }
 
 /**
@@ -39,6 +41,7 @@ export function storeSession(
   sessionId: Id<"sessions">,
   name: string,
   token: string,
+  mood?: Mood,
 ): void {
   try {
     const key = `retro_session_${sessionId}`;
@@ -46,6 +49,7 @@ export function storeSession(
       name,
       token,
       joinedAt: Date.now(),
+      mood,
     };
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {

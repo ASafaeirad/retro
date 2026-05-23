@@ -119,9 +119,10 @@ export default defineSchema({
 
 ## Architecture
 
-**UI Components**: Base UI React (headless) + custom styling in
-[src/ui/](src/ui/). Each component has `.stories.tsx` for Storybook. Example:
-[src/ui/Button/Button.tsx](src/ui/Button/Button.tsx).
+**Design System**: Base UI React (headless) + custom styling in [src/components/ui/](src/components/ui/).
+
+- For icons use `lucide-react` package instead of SVGs.
+- Use components from here instead of implementing styles.
 
 ## Project Conventions
 

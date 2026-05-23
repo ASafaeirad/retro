@@ -181,6 +181,7 @@ export const joinSession = mutation({
     sessionId: v.id('sessions'),
     name: v.string(),
     sessionToken: v.string(),
+    mood: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = Date.now()
@@ -194,10 +195,11 @@ export const joinSession = mutation({
     if (existing) {
       // If participant exists, validate token to allow rejoin
       if (existing.sessionToken === args.sessionToken) {
-        // Valid token - update lastActiveAt and return existing participant ID
+        // Valid token - update lastActiveAt and mood, return existing participant ID
         await ctx.db.patch(existing._id, {
           lastActiveAt: now,
           joinedAt: now, // Update rejoin time
+          mood: args.mood,
         })
         return existing._id
       } else {
@@ -214,6 +216,31 @@ export const joinSession = mutation({
       joinedAt: now,
       sessionToken: args.sessionToken,
       lastActiveAt: now,
+      mood: args.mood,
+    })
+  },
+})
+
+export const updateParticipantMood = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    participantName: v.string(),
+    mood: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const participant = await ctx.db
+      .query('participants')
+      .withIndex('sessionAndName', (q) =>
+        q.eq('sessionId', args.sessionId).eq('name', args.participantName)
+      )
+      .first()
+
+    if (!participant) {
+      throw new Error('Participant not found')
+    }
+
+    await ctx.db.patch(participant._id, {
+      mood: args.mood,
     })
   },
 })
