@@ -5,6 +5,7 @@
   --background: oklch(95.31% 0.0496 169.04);
   --secondary-background: oklch(100% 0 0);
   --foreground: oklch(0% 0 0);
+  --fg-muted: oklch(0% 0 0 / 0.6);
   --main-foreground: oklch(0% 0 0);
   --main: oklch(77.54% 0.1681 162.78);
   --border: oklch(0% 0 0);
@@ -26,6 +27,7 @@
   --color-danger: var(--danger);
   --color-secondary-background: var(--secondary-background);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--fg-muted);
   --color-main-foreground: var(--main-foreground);
   --color-border: var(--border);
   --color-overlay: var(--overlay);
@@ -48,7 +50,7 @@
 
 @layer base {
   body {
-    @apply text-foreground font-base bg-background;
+    @apply text-foreground font-base;
   }
 
   h1, h2, h3, h4, h5, h6{

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api } from "#convex/api";
 import { Button } from "#ui/button.tsx";
 import type { Id } from "../../convex/_generated/dataModel";
+import { Logo } from "../components/Logo.tsx";
 import { generateToken, storeSession } from "../lib/participantAuth";
 
 export const Route = createFileRoute("/")({
@@ -23,8 +24,7 @@ function RetroSessionsPage() {
   const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
   const [joinName, setJoinName] = useState("");
 
-  const handleCreateSession = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateSession = async () => {
     if (!sprintNumber || !creatorName.trim()) return;
 
     try {
@@ -86,198 +86,202 @@ function RetroSessionsPage() {
   const completedSessions = sessions.filter((s) => !s.isActive);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] py-8 px-4">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[var(--sea-ink)]">
-            Retro Board
-          </h1>
-          <p className="mt-2 text-[var(--sea-ink-soft)]">
-            Create or join a retrospective session
-          </p>
-        </div>
+    <div className="min-h-screen py-6 px-4 mx-auto max-w-4xl">
+      <header className="mb-8 flex justify-center">
+        <Logo className="h-10 w-auto" />
+      </header>
+      <hr className="mb-8" />
 
-        {/* Create new session */}
-        <div className="mb-8 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-6">
-          {!isCreating ? (
-            <Button
-              type="button"
-              onClick={() => setIsCreating(true)}
-              className="w-full"
-            >
+      {isCreating && (
+        <CreateSessionModal
+          onClose={() => setIsCreating(false)}
+          onCreate={handleCreateSession}
+        />
+      )}
+
+      {/* Active sessions */}
+      {activeSessions.length > 0 && (
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <h2 className="text-xl">Active Sessions</h2>
+            <Button type="button" onClick={() => setIsCreating(true)}>
               + Create New Session
             </Button>
-          ) : (
-            <form onSubmit={handleCreateSession} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="sprintNumber"
-                  className="block text-sm font-medium text-[var(--sea-ink)] mb-2"
-                >
-                  Sprint Number
-                </label>
-                <input
-                  id="sprintNumber"
-                  type="number"
-                  value={sprintNumber}
-                  onChange={(e) => setSprintNumber(e.target.value)}
-                  placeholder="e.g., 42"
-                  className="w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
-                  required
-                  autoFocus
-                />
-              </div>
+          </div>
 
-              <div>
-                <label
-                  htmlFor="creatorName"
-                  className="block text-sm font-medium text-[var(--sea-ink)] mb-2"
-                >
-                  Your Name (you'll be the Scrum Master)
-                </label>
-                <input
-                  id="creatorName"
-                  type="text"
-                  value={creatorName}
-                  onChange={(e) => setCreatorName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
-                  required
-                />
-              </div>
+          <div className="space-y-3">
+            {activeSessions.map((session) => (
+              <div
+                key={session._id}
+                className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--sea-ink)]">
+                      Sprint {session.sprintNumber}
+                    </h3>
+                    <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
+                      Phase: {session.phase.replace("_", " ")} •{" "}
+                      {session.participantCount} participants
+                    </p>
+                    <p className="text-xs text-[var(--sea-ink-soft)] mt-1">
+                      Scrum Master: {session.createdBy}
+                    </p>
+                  </div>
 
-              <div className="flex gap-2">
-                <Button type="submit" className="flex-1">
-                  Create Session
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setIsCreating(false);
-                    setSprintNumber("");
-                    setCreatorName("");
-                  }}
-                  variant="neutral"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          )}
-        </div>
-
-        {/* Active sessions */}
-        {activeSessions.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-4 text-xl font-semibold text-[var(--sea-ink)]">
-              Active Sessions
-            </h2>
-            <div className="space-y-3">
-              {activeSessions.map((session) => (
-                <div
-                  key={session._id}
-                  className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-[var(--sea-ink)]">
-                        Sprint {session.sprintNumber}
-                      </h3>
-                      <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                        Phase: {session.phase.replace("_", " ")} •{" "}
-                        {session.participantCount} participants
-                      </p>
-                      <p className="text-xs text-[var(--sea-ink-soft)] mt-1">
-                        Scrum Master: {session.createdBy}
-                      </p>
-                    </div>
-
-                    {joiningSessionId === session._id ? (
-                      <div className="flex gap-2 items-center">
-                        <input
-                          type="text"
-                          value={joinName}
-                          onChange={(e) => setJoinName(e.target.value)}
-                          placeholder="Your name"
-                          className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleJoinSession(session._id);
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={() => handleJoinSession(session._id)}
-                          disabled={!joinName.trim()}
-                        >
-                          Join
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setJoiningSessionId(null);
-                            setJoinName("");
-                          }}
-                          variant="neutral"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button onClick={() => setJoiningSessionId(session._id)}>
-                        Join Session
+                  {joiningSessionId === session._id ? (
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="text"
+                        value={joinName}
+                        onChange={(e) => setJoinName(e.target.value)}
+                        placeholder="Your name"
+                        className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleJoinSession(session._id);
+                          }
+                        }}
+                      />
+                      <Button
+                        onClick={() => handleJoinSession(session._id)}
+                        disabled={!joinName.trim()}
+                      >
+                        Join
                       </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Completed sessions */}
-        {completedSessions.length > 0 && (
-          <div>
-            <h2 className="mb-4 text-xl font-semibold text-[var(--sea-ink)]">
-              Completed Sessions
-            </h2>
-            <div className="space-y-3">
-              {completedSessions.map((session) => (
-                <div
-                  key={session._id}
-                  className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4 opacity-75"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-[var(--sea-ink)]">
-                        Sprint {session.sprintNumber}
-                      </h3>
-                      <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                        Completed • {session.participantCount} participants
-                      </p>
+                      <Button
+                        onClick={() => {
+                          setJoiningSessionId(null);
+                          setJoinName("");
+                        }}
+                        variant="neutral"
+                      >
+                        Cancel
+                      </Button>
                     </div>
-
-                    <Button
-                      onClick={() => navigate({ to: `/retro/${session._id}` })}
-                      variant="neutral"
-                    >
-                      View
+                  ) : (
+                    <Button onClick={() => setJoiningSessionId(session._id)}>
+                      Join Session
                     </Button>
-                  </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
+      <hr className="mb-8" />
+      {/* Completed sessions */}
+      {completedSessions.length > 0 && (
+        <div>
+          <h2 className="mb-4 text-xl font-semibold text-[var(--sea-ink)]">
+            Completed Sessions
+          </h2>
+          <div className="space-y-3">
+            {completedSessions.map((session) => (
+              <div
+                key={session._id}
+                className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4 opacity-75"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--sea-ink)]">
+                      Sprint {session.sprintNumber}
+                    </h3>
+                    <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
+                      Completed • {session.participantCount} participants
+                    </p>
+                  </div>
 
-        {sessions.length === 0 && (
-          <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center">
-            <p className="text-[var(--sea-ink-soft)]">
-              No sessions yet. Create your first retro session to get started!
-            </p>
+                  <Button
+                    onClick={() => navigate({ to: `/retro/${session._id}` })}
+                    variant="neutral"
+                  >
+                    View
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {sessions.length === 0 && (
+        <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center">
+          <p className="text-[var(--sea-ink-soft)]">
+            No sessions yet. Create your first retro session to get started!
+          </p>
+        </div>
+      )}
     </div>
   );
 }
+
+export const CreateSessionModal = ({
+  onClose,
+  onCreate,
+}: {
+  onClose?: () => void;
+  onCreate?: () => void;
+}) => {
+  const [sprintNumber, setSprintNumber] = useState("");
+  const [creatorName, setCreatorName] = useState("");
+
+  return (
+    <form onSubmit={onCreate} className="space-y-4 mb-8">
+      <div>
+        <label
+          htmlFor="sprintNumber"
+          className="block text-sm font-medium mb-2"
+        >
+          Sprint Number
+        </label>
+        <input
+          id="sprintNumber"
+          type="number"
+          value={sprintNumber}
+          onChange={(e) => setSprintNumber(e.target.value)}
+          placeholder="e.g., 42"
+          className="w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
+          required
+          autoFocus
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="creatorName"
+          className="block text-sm font-medium text-[var(--sea-ink)] mb-2"
+        >
+          Your Name (you'll be the Scrum Master)
+        </label>
+        <input
+          id="creatorName"
+          type="text"
+          value={creatorName}
+          onChange={(e) => setCreatorName(e.target.value)}
+          placeholder="Enter your name"
+          className="w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
+          required
+        />
+      </div>
+
+      <div className="flex gap-2">
+        <Button type="submit" className="flex-1">
+          Create Session
+        </Button>
+        <Button
+          onClick={() => {
+            setSprintNumber("");
+            setCreatorName("");
+            onClose?.();
+          }}
+          variant="neutral"
+        >
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+};
