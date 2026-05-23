@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --background: oklch(95.31% 0.0496 169.04);
   --secondary-background: oklch(100% 0 0);
@@ -19,23 +17,6 @@
   --chart-4: #FF4D50;
   --chart-5: #0099FF;
   --chart-active-dot: #000;
-}
-
-.dark {
-  --background: oklch(22.71% 0.0252 182.05);
-  --secondary-background: oklch(23.93% 0 0);
-  --foreground: oklch(92.49% 0 0);
-  --main-foreground: oklch(0% 0 0);
-  --main: oklch(70.54% 0.1525 162.97);
-  --border: oklch(0% 0 0);
-  --ring: oklch(100% 0 0);
-  --shadow: 4px 4px 0px 0px var(--border);
-  --chart-1: #00BD84;
-  --chart-2: #7A83FF;
-  --chart-3: #E0B700;
-  --chart-4: #FF6669;
-  --chart-5: #008AE5;
-  --chart-active-dot: #fff;
 }
 
 @theme inline {
