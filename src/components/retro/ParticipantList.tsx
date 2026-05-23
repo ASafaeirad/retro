@@ -1,26 +1,42 @@
 import { cn } from "#lib/cn";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 interface Participant {
-  _id: string;
+  _id: Id<"participants">;
   name: string;
   isReady: boolean;
+  lastActiveAt: number;
 }
 
 interface ParticipantListProps {
   participants: Participant[];
   scrumMaster: string;
   currentPresenter?: string;
+  currentUserName?: string;
   onSelectPresenter?: (name: string) => void;
+  onLeaveSession?: () => void;
+  onRemoveParticipant?: (participantId: Id<"participants">) => void;
   className?: string;
+}
+
+const INACTIVE_THRESHOLD = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+function isParticipantActive(lastActiveAt: number): boolean {
+  return Date.now() - lastActiveAt < INACTIVE_THRESHOLD;
 }
 
 export function ParticipantList({
   participants,
   scrumMaster,
   currentPresenter,
+  currentUserName,
   onSelectPresenter,
+  onLeaveSession,
+  onRemoveParticipant,
   className,
 }: ParticipantListProps) {
+  const isScrumMaster = currentUserName === scrumMaster;
+
   return (
     <div
       className={cn(
@@ -33,46 +49,93 @@ export function ParticipantList({
       </h3>
 
       <div className="space-y-2">
-        {participants.map((participant) => (
-          <div
-            key={participant._id}
-            onClick={() => onSelectPresenter?.(participant.name)}
-            className={cn(
-              "flex items-center justify-between rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 transition-colors",
-              onSelectPresenter &&
-                "cursor-pointer hover:bg-[var(--link-bg-hover)]",
-              currentPresenter === participant.name &&
-                "ring-2 ring-[var(--lagoon)] border-[var(--lagoon)]",
-            )}
-          >
-            <div className="flex items-center gap-2">
-              {/* Ready status indicator */}
-              <div
-                className={cn(
-                  "h-2 w-2 rounded-full",
-                  participant.isReady
-                    ? "bg-[var(--lagoon)]"
-                    : "bg-[var(--line)]",
-                )}
-              />
+        {participants.map((participant) => {
+          const isActive = isParticipantActive(participant.lastActiveAt);
+          const isCurrentUser = participant.name === currentUserName;
 
-              <span className="text-sm text-[var(--sea-ink)]">
-                {participant.name}
-                {participant.name === scrumMaster && (
-                  <span className="ml-2 text-xs text-[var(--kicker)] font-medium">
-                    (SM)
+          return (
+            <div
+              key={participant._id}
+              onClick={() => onSelectPresenter?.(participant.name)}
+              className={cn(
+                "flex items-center justify-between rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 transition-colors",
+                onSelectPresenter &&
+                  "cursor-pointer hover:bg-[var(--link-bg-hover)]",
+                currentPresenter === participant.name &&
+                  "ring-2 ring-[var(--lagoon)] border-[var(--lagoon)]",
+                !isActive && "opacity-50",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                {/* Active/Ready status indicator */}
+                <div
+                  className={cn(
+                    "h-2 w-2 rounded-full",
+                    !isActive
+                      ? "bg-[var(--sand)]" // Inactive (gray)
+                      : participant.isReady
+                        ? "bg-[var(--lagoon)]" // Ready (blue)
+                        : "bg-[var(--palm)]", // Active but not ready (green)
+                  )}
+                />
+
+                <div className="flex flex-col">
+                  <span
+                    className={cn(
+                      "text-sm",
+                      isActive
+                        ? "text-[var(--sea-ink)]"
+                        : "text-[var(--sea-ink-soft)]",
+                    )}
+                  >
+                    {participant.name}
+                    {participant.name === scrumMaster && (
+                      <span className="ml-2 text-xs text-[var(--kicker)] font-medium">
+                        (SM)
+                      </span>
+                    )}
+                    {isCurrentUser && (
+                      <span className="ml-2 text-xs text-[var(--sea-ink-soft)] font-medium">
+                        (You)
+                      </span>
+                    )}
+                  </span>
+                  {!isActive && (
+                    <span className="text-xs text-[var(--sea-ink-soft)]">
+                      Disconnected
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {participant.isReady && isActive && (
+                  <span className="text-xs text-[var(--lagoon)] font-medium">
+                    Ready
                   </span>
                 )}
-              </span>
-            </div>
 
-            {participant.isReady && (
-              <span className="text-xs text-[var(--lagoon)] font-medium">
-                Ready
-              </span>
-            )}
-          </div>
-        ))}
+                {/* Remove button for scrum master */}
+                {isScrumMaster &&
+                  !isCurrentUser &&
+                  onRemoveParticipant &&
+                  !isActive && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveParticipant(participant._id);
+                      }}
+                      className="rounded px-2 py-1 text-xs font-medium text-[var(--sand)] hover:text-[var(--sea-ink)] transition-colors"
+                      title="Remove participant"
+                    >
+                      Remove
+                    </button>
+                  )}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {participants.length > 0 && (
@@ -80,6 +143,17 @@ export function ParticipantList({
           {participants.filter((p) => p.isReady).length} / {participants.length}{" "}
           ready
         </div>
+      )}
+
+      {/* Leave session button */}
+      {onLeaveSession && (
+        <button
+          type="button"
+          onClick={onLeaveSession}
+          className="mt-4 w-full rounded-md border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-2 text-xs font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
+        >
+          Leave Session
+        </button>
       )}
     </div>
   );

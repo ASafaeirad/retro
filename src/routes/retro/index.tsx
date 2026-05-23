@@ -3,6 +3,8 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "#convex/api";
 import { cn } from "#lib/cn";
+import type { Id } from "../../../convex/_generated/dataModel";
+import { generateToken, storeSession } from "../../lib/participantAuth";
 
 export const Route = createFileRoute("/retro/")({
   component: RetroSessionsPage,
@@ -26,10 +28,15 @@ function RetroSessionsPage() {
     if (!sprintNumber || !creatorName.trim()) return;
 
     try {
+      const token = generateToken();
       const sessionId = await createSession({
         sprintNumber: Number(sprintNumber),
         creatorName: creatorName.trim(),
+        sessionToken: token,
       });
+
+      // Store session credentials in localStorage
+      storeSession(sessionId, creatorName.trim(), token);
 
       // Navigate to the new session
       navigate({
@@ -46,10 +53,15 @@ function RetroSessionsPage() {
     if (!joinName.trim()) return;
 
     try {
+      const token = generateToken();
       await joinSession({
-        sessionId: sessionId as any,
+        sessionId: sessionId as Id<"sessions">,
         name: joinName.trim(),
+        sessionToken: token,
       });
+
+      // Store session credentials in localStorage
+      storeSession(sessionId as Id<"sessions">, joinName.trim(), token);
 
       // Navigate to the session
       navigate({

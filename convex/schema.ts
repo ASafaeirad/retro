@@ -45,9 +45,12 @@ export default defineSchema({
     name: v.string(),
     isReady: v.boolean(),
     joinedAt: v.number(),
+    sessionToken: v.optional(v.string()),
+    lastActiveAt: v.number(),
   })
     .index('sessionId', ['sessionId'])
-    .index('sessionAndName', ['sessionId', 'name']),
+    .index('sessionAndName', ['sessionId', 'name'])
+    .index('sessionAndToken', ['sessionId', 'sessionToken']),
 
   tickets: defineTable({
     sessionId: v.id('sessions'),

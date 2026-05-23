@@ -5,7 +5,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActionItemPanel } from "#components/retro/ActionItemPanel.tsx";
 import { AddTicketForm } from "#components/retro/AddTicketForm.tsx";
 import { BoardColumn } from "#components/retro/BoardColumn.tsx";
@@ -17,6 +17,12 @@ import { Timer } from "#components/retro/Timer.tsx";
 import { api } from "#convex/api";
 import { cn } from "#lib/cn";
 import type { Id } from "../../../convex/_generated/dataModel";
+import {
+  clearSession,
+  generateToken,
+  getStoredSession,
+  storeSession,
+} from "../../lib/participantAuth";
 
 export const Route = createFileRoute("/retro/$sessionId")({
   component: RetroBoard,
@@ -76,6 +82,9 @@ function RetroBoard() {
   const toggleActionItemComplete = useMutation(
     api.retro.toggleActionItemComplete,
   );
+  const updateHeartbeat = useMutation(api.retro.updateHeartbeat);
+  const leaveSession = useMutation(api.retro.leaveSession);
+  const removeParticipant = useMutation(api.retro.removeParticipant);
 
   const [addingTicketCategory, setAddingTicketCategory] = useState<
     "well" | "improve" | null
@@ -96,6 +105,46 @@ function RetroBoard() {
 
     return items.sort((a, b) => (b.voteLimit || 0) - (a.voteLimit || 0));
   }, [tickets, ticketGroups]);
+
+  // Auto-rejoin logic: If no name in URL, check localStorage for stored session
+  useEffect(() => {
+    if (!name) {
+      const stored = getStoredSession(sessionId as Id<"sessions">);
+      if (stored) {
+        // Auto-navigate with stored name
+        navigate({
+          to: `/retro/${sessionId}`,
+          search: { name: stored.name },
+          replace: true,
+        });
+      }
+    }
+  }, [name, sessionId, navigate]);
+
+  // Heartbeat system: Send heartbeat every 30 seconds to update lastActiveAt
+  useEffect(() => {
+    if (!name) return;
+
+    // Send initial heartbeat
+    updateHeartbeat({
+      sessionId: sessionId as Id<"sessions">,
+      participantName: name,
+    }).catch((error) => {
+      console.error("Failed to send heartbeat:", error);
+    });
+
+    // Set up interval for periodic heartbeats
+    const heartbeatInterval = setInterval(() => {
+      updateHeartbeat({
+        sessionId: sessionId as Id<"sessions">,
+        participantName: name,
+      }).catch((error) => {
+        console.error("Failed to send heartbeat:", error);
+      });
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(heartbeatInterval);
+  }, [name, sessionId, updateHeartbeat]);
 
   // Check if current user is scrum master
   const isScrumMaster = session?.createdBy === name;
@@ -146,6 +195,52 @@ function RetroBoard() {
       imageUrl,
     });
     setAddingTicketCategory(null);
+  };
+
+  // Leave session
+  const handleLeaveSession = async () => {
+    if (!name) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to leave this session? You can rejoin later with the same name.",
+    );
+    if (!confirmed) return;
+
+    try {
+      await leaveSession({
+        sessionId: sessionId as Id<"sessions">,
+        participantName: name,
+      });
+
+      // Clear stored session from localStorage
+      clearSession(sessionId as Id<"sessions">);
+
+      // Navigate back to session list
+      navigate({ to: "/retro" });
+    } catch (error) {
+      console.error("Failed to leave session:", error);
+      alert("Failed to leave session. Please try again.");
+    }
+  };
+
+  // Remove participant (scrum master only)
+  const handleRemoveParticipant = async (participantId: Id<"participants">) => {
+    if (!isScrumMaster || !name) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to remove this participant?",
+    );
+    if (!confirmed) return;
+
+    try {
+      await removeParticipant({
+        participantId,
+        requestedBy: name,
+      });
+    } catch (error) {
+      console.error("Failed to remove participant:", error);
+      alert("Failed to remove participant. Please try again.");
+    }
   };
 
   // Handle drag end for grouping
@@ -620,6 +715,7 @@ function RetroBoard() {
                         </div>
                         {isScrumMaster && !session.timerState && (
                           <button
+                            type="button"
                             onClick={() =>
                               startTimer({
                                 sessionId: sessionId as Id<"sessions">,
@@ -633,7 +729,7 @@ function RetroBoard() {
                         )}
                       </div>
                       <div className="grid grid-cols-4 gap-3">
-                        {item.tickets?.map((ticket: any) => (
+                        {item.tickets?.map((ticket) => (
                           <TicketCard
                             id={ticket._id}
                             key={ticket._id}
@@ -645,13 +741,10 @@ function RetroBoard() {
                     </div>
                   ) : (
                     <div className="flex items-start justify-between">
-                      <TicketCard
-                        id={ticket._id}
-                        {...(item as any)}
-                        className="flex-1"
-                      />
+                      <TicketCard id={item._id} {...item} className="flex-1" />
                       {isScrumMaster && !session.timerState && (
                         <button
+                          type="button"
                           onClick={() =>
                             startTimer({
                               sessionId: sessionId as Id<"sessions">,
@@ -727,6 +820,7 @@ function RetroBoard() {
               participants={participants}
               scrumMaster={session.createdBy}
               currentPresenter={session.currentPresenter}
+              currentUserName={name}
               onSelectPresenter={
                 isScrumMaster && session.phase === "PRESENT"
                   ? (name) =>
@@ -735,6 +829,10 @@ function RetroBoard() {
                         presenterName: name,
                       })
                   : undefined
+              }
+              onLeaveSession={handleLeaveSession}
+              onRemoveParticipant={
+                isScrumMaster ? handleRemoveParticipant : undefined
               }
             />
 
@@ -783,15 +881,43 @@ function RetroBoard() {
 // Name entry screen component
 function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
   const navigate = useNavigate();
+  const joinSession = useMutation(api.retro.joinSession);
   const [name, setName] = useState("");
+  const [isJoining, setIsJoining] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
+    if (!name.trim() || isJoining) return;
+
+    setIsJoining(true);
+    try {
+      // Check for stored session token (for rejoin scenario) or generate new one
+      const stored = getStoredSession(sessionId);
+      const token = stored?.token || generateToken();
+
+      // Call joinSession mutation with token
+      await joinSession({
+        sessionId,
+        name: name.trim(),
+        sessionToken: token,
+      });
+
+      // Store session credentials in localStorage
+      storeSession(sessionId, name.trim(), token);
+
+      // Navigate to the session
       navigate({
         to: `/retro/${sessionId}`,
         search: { name: name.trim() },
       });
+    } catch (error) {
+      console.error("Failed to join session:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to join session. Name might already be taken.",
+      );
+      setIsJoining(false);
     }
   };
 
@@ -818,15 +944,15 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
 
           <button
             type="submit"
-            disabled={!name.trim()}
+            disabled={!name.trim() || isJoining}
             className={cn(
               "w-full rounded-md px-4 py-3 text-sm font-medium text-white transition-colors",
-              name.trim()
+              name.trim() && !isJoining
                 ? "bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)]"
                 : "bg-[var(--line)] cursor-not-allowed",
             )}
           >
-            Join Session
+            {isJoining ? "Joining..." : "Join Session"}
           </button>
         </form>
 

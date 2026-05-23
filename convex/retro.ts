@@ -151,6 +151,7 @@ export const createSession = mutation({
   args: {
     sprintNumber: v.number(),
     creatorName: v.string(),
+    sessionToken: v.string(),
   },
   handler: async (ctx, args) => {
     // Create the session
@@ -167,6 +168,8 @@ export const createSession = mutation({
       name: args.creatorName,
       isReady: false,
       joinedAt: Date.now(),
+      sessionToken: args.sessionToken,
+      lastActiveAt: Date.now(),
     })
 
     return sessionId
@@ -177,8 +180,11 @@ export const joinSession = mutation({
   args: {
     sessionId: v.id('sessions'),
     name: v.string(),
+    sessionToken: v.string(),
   },
   handler: async (ctx, args) => {
+    const now = Date.now()
+
     // Check if participant already exists
     const existing = await ctx.db
       .query('participants')
@@ -186,14 +192,28 @@ export const joinSession = mutation({
       .first()
 
     if (existing) {
-      throw new Error('Participant with this name already exists in this session')
+      // If participant exists, validate token to allow rejoin
+      if (existing.sessionToken === args.sessionToken) {
+        // Valid token - update lastActiveAt and return existing participant ID
+        await ctx.db.patch(existing._id, {
+          lastActiveAt: now,
+          joinedAt: now, // Update rejoin time
+        })
+        return existing._id
+      } else {
+        // Token mismatch
+        throw new Error('Participant with this name already exists in this session')
+      }
     }
 
+    // New participant - create record
     return await ctx.db.insert('participants', {
       sessionId: args.sessionId,
       name: args.name,
       isReady: false,
-      joinedAt: Date.now(),
+      joinedAt: now,
+      sessionToken: args.sessionToken,
+      lastActiveAt: now,
     })
   },
 })
@@ -501,5 +521,76 @@ export const toggleActionItemComplete = mutation({
       completed: !actionItem.completed,
       completedAt: !actionItem.completed ? Date.now() : undefined,
     })
+  },
+})
+
+// ===== PARTICIPANT MANAGEMENT =====
+
+export const updateHeartbeat = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    participantName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const participant = await ctx.db
+      .query('participants')
+      .withIndex('sessionAndName', (q) =>
+        q.eq('sessionId', args.sessionId).eq('name', args.participantName)
+      )
+      .first()
+
+    if (!participant) {
+      throw new Error('Participant not found')
+    }
+
+    await ctx.db.patch(participant._id, {
+      lastActiveAt: Date.now(),
+    })
+  },
+})
+
+export const leaveSession = mutation({
+  args: {
+    sessionId: v.id('sessions'),
+    participantName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const participant = await ctx.db
+      .query('participants')
+      .withIndex('sessionAndName', (q) =>
+        q.eq('sessionId', args.sessionId).eq('name', args.participantName)
+      )
+      .first()
+
+    if (!participant) {
+      throw new Error('Participant not found')
+    }
+
+    await ctx.db.delete(participant._id)
+  },
+})
+
+export const removeParticipant = mutation({
+  args: {
+    participantId: v.id('participants'),
+    requestedBy: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const participant = await ctx.db.get(args.participantId)
+    if (!participant) {
+      throw new Error('Participant not found')
+    }
+
+    // Verify requestedBy is the scrum master
+    const session = await ctx.db.get(participant.sessionId)
+    if (!session) {
+      throw new Error('Session not found')
+    }
+
+    if (session.createdBy !== args.requestedBy) {
+      throw new Error('Only the scrum master can remove participants')
+    }
+
+    await ctx.db.delete(args.participantId)
   },
 })
