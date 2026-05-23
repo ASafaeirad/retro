@@ -16,7 +16,6 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check"
@@ -46,15 +45,11 @@
     "@biomejs/biome": "2.4.15",
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/devtools-vite": "0.7.0",
-    "@testing-library/dom": "10.4.1",
-    "@testing-library/react": "16.3.2",
     "@types/node": "25.9.1",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "jsdom": "29.1.1",
     "typescript": "6.0.3",
-    "vite": "8.0.14",
-    "vitest": "4.1.7"
+    "vite": "8.0.14"
   }
 }
