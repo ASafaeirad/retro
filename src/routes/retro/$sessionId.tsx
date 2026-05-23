@@ -1,11 +1,15 @@
-import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import {
+  DragDropProvider,
+  type DragEndEvent,
+  useDroppable,
+} from "@dnd-kit/react";
 import {
   createFileRoute,
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { ActionItemPanel } from "#components/retro/ActionItemPanel.tsx";
 import { AddTicketForm } from "#components/retro/AddTicketForm.tsx";
 import { BoardColumn } from "#components/retro/BoardColumn.tsx";
@@ -33,6 +37,25 @@ export const Route = createFileRoute("/retro/$sessionId")({
     };
   },
 });
+
+// Droppable zone for ungrouped tickets
+function UngroupedZone({ children }: { children: ReactNode }) {
+  const { ref, isDropTarget } = useDroppable({
+    id: "ungrouped-zone",
+  });
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "grid grid-cols-4 gap-3 rounded-lg p-4 transition-colors min-h-[200px]",
+        isDropTarget && "bg-[var(--link-bg-hover)] ring-2 ring-[var(--lagoon)]",
+      )}
+    >
+      {children}
+    </div>
+  );
+}
 
 function RetroBoard() {
   const { sessionId } = Route.useParams();
@@ -296,8 +319,19 @@ function RetroBoard() {
     const { source, target } = event.operation;
     if (!source || !target || source.id === target.id) return;
 
-    // Dragging a ticket onto another ticket to create/add to group
     const draggedTicket = tickets.find((t) => t._id === source.id);
+
+    // Check if dropped on the ungrouped zone
+    if (target.id === "ungrouped-zone" && draggedTicket) {
+      // Remove ticket from its group
+      await addTicketToGroup({
+        ticketId: draggedTicket._id,
+        groupId: undefined,
+      });
+      return;
+    }
+
+    // Dragging a ticket onto another ticket to create/add to group
     const targetTicket = tickets.find((t) => t._id === target.id);
 
     if (draggedTicket && targetTicket) {
@@ -618,16 +652,21 @@ function RetroBoard() {
               )}
 
               {/* Ungrouped tickets */}
-              <div className="grid grid-cols-4 gap-3">
-                {tickets
-                  .filter((t) => !t.groupId)
-                  .map((ticket) => (
-                    <DraggableTicketCard
-                      key={ticket._id}
-                      id={ticket._id}
-                      {...ticket}
-                    />
-                  ))}
+              <div>
+                <div className="mb-3 text-sm font-semibold text-[var(--sea-ink)]">
+                  Ungrouped Tickets
+                </div>
+                <UngroupedZone>
+                  {tickets
+                    .filter((t) => !t.groupId)
+                    .map((ticket) => (
+                      <DraggableTicketCard
+                        key={ticket._id}
+                        id={ticket._id}
+                        {...ticket}
+                      />
+                    ))}
+                </UngroupedZone>
               </div>
             </div>
           </DragDropProvider>

@@ -308,6 +308,8 @@ export const deleteTicket = mutation({
       throw new Error('You can only delete your own tickets')
     }
 
+    const groupId = ticket.groupId
+
     // Delete associated votes
     const votes = await ctx.db
       .query('votes')
@@ -320,6 +322,30 @@ export const deleteTicket = mutation({
 
     // Delete the ticket
     await ctx.db.delete(args.ticketId)
+
+    // If ticket was in a group, check if that group is now empty
+    if (groupId) {
+      const remainingTickets = await ctx.db
+        .query('tickets')
+        .withIndex('groupId', (q) => q.eq('groupId', groupId))
+        .collect()
+
+      // If no tickets remain in the group, delete it
+      if (remainingTickets.length === 0) {
+        // First delete all votes associated with this group
+        const groupVotes = await ctx.db
+          .query('votes')
+          .withIndex('groupId', (q) => q.eq('groupId', groupId))
+          .collect()
+
+        for (const vote of groupVotes) {
+          await ctx.db.delete(vote._id)
+        }
+
+        // Then delete the group itself
+        await ctx.db.delete(groupId)
+      }
+    }
   },
 })
 
@@ -400,9 +426,42 @@ export const addTicketToGroup = mutation({
     groupId: v.optional(v.id('ticketGroups')),
   },
   handler: async (ctx, args) => {
+    // Get the ticket's current group (if any) before updating
+    const ticket = await ctx.db.get(args.ticketId)
+    if (!ticket) {
+      throw new Error('Ticket not found')
+    }
+
+    const oldGroupId = ticket.groupId
+
+    // Update the ticket with new groupId
     await ctx.db.patch(args.ticketId, {
       groupId: args.groupId,
     })
+
+    // If ticket was in a group before, check if that group is now empty
+    if (oldGroupId) {
+      const remainingTickets = await ctx.db
+        .query('tickets')
+        .withIndex('groupId', (q) => q.eq('groupId', oldGroupId))
+        .collect()
+
+      // If no tickets remain in the old group, delete it
+      if (remainingTickets.length === 0) {
+        // First delete all votes associated with this group
+        const groupVotes = await ctx.db
+          .query('votes')
+          .withIndex('groupId', (q) => q.eq('groupId', oldGroupId))
+          .collect()
+
+        for (const vote of groupVotes) {
+          await ctx.db.delete(vote._id)
+        }
+
+        // Then delete the group itself
+        await ctx.db.delete(oldGroupId)
+      }
+    }
   },
 })
 
@@ -418,16 +477,25 @@ export const castVote = mutation({
       throw new Error('Must vote on either a ticket or a group')
     }
 
+    // Check if user has already voted on this ticket/group
+    const existingVotes = await ctx.db
+      .query('votes')
+      .withIndex('sessionAndParticipant', (q) =>
+        q.eq('sessionId', args.sessionId).eq('participantName', args.participantName)
+      )
+      .collect()
+
+    const alreadyVoted = existingVotes.some((vote) =>
+      args.ticketId ? vote.ticketId === args.ticketId : vote.groupId === args.groupId
+    )
+
+    if (alreadyVoted) {
+      throw new Error('You have already voted on this item')
+    }
+
     // Check vote limit
     const session = await ctx.db.get(args.sessionId)
     if (session?.voteLimit) {
-      const existingVotes = await ctx.db
-        .query('votes')
-        .withIndex('sessionAndParticipant', (q) =>
-          q.eq('sessionId', args.sessionId).eq('participantName', args.participantName)
-        )
-        .collect()
-
       if (existingVotes.length >= session.voteLimit) {
         throw new Error('Vote limit reached')
       }
