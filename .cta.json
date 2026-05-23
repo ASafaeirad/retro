@@ -1,0 +1,24 @@
+{
+  "projectName": "retro",
+  "mode": "file-router",
+  "typescript": true,
+  "packageManager": "pnpm",
+  "includeExamples": true,
+  "tailwind": true,
+  "addOnOptions": {},
+  "envVarValues": {
+    "CONVEX_DEPLOYMENT": "dev/alireza-safaierad",
+    "VITE_CONVEX_URL": "https://youthful-oriole-90.eu-west-1.convex.cloud"
+  },
+  "git": true,
+  "install": true,
+  "routerOnly": false,
+  "version": 1,
+  "framework": "react",
+  "chosenAddOns": [
+    "biome",
+    "nitro",
+    "shadcn",
+    "convex"
+  ]
+}
