@@ -3,7 +3,14 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#/*": "./src/*"
+    "#convex/api": "./convex/_generated/api.js",
+    "#models/*": "./src/models/*",
+    "#lib/cn": "./src/lib/cn.ts",
+    "#lib/result": "./src/lib/result.ts",
+    "#lib/config": "./src/lib/config.ts",
+    "#components/*": "./src/components/*",
+    "#ui/*": "./src/components/ui/*",
+    "#hooks/*": "./src/hooks/*"
   },
   "scripts": {
     "dev": "vite dev --port 3000",
@@ -31,7 +38,8 @@
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "tailwind-merge": "3.6.0",
-    "tailwindcss": "4.3.0"
+    "tailwindcss": "4.3.0",
+    "valibot": "1.4.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
