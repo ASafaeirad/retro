@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { SessionList } from "#components/SessionList.tsx";
+import { Input } from "#components/ui/input.tsx";
+import { Label } from "#components/ui/label.tsx";
 import { api } from "#convex/api";
 import { Button } from "#ui/button.tsx";
 import { Logo } from "../components/Logo.tsx";
@@ -119,38 +121,28 @@ export const CreateSessionModal = ({
       className="space-y-4 mb-8"
     >
       <div>
-        <label
-          htmlFor="sprintNumber"
-          className="block text-sm font-medium mb-2"
-        >
-          Sprint Number
-        </label>
-        <input
+        <Label htmlFor="sprintNumber">Sprint Number</Label>
+        <Input
           id="sprintNumber"
           type="number"
           value={sprintNumber}
           onChange={(e) => setSprintNumber(e.target.value)}
           placeholder="e.g., 42"
-          className="w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
           required
           autoFocus
         />
       </div>
 
       <div>
-        <label
-          htmlFor="creatorName"
-          className="block text-sm font-medium text-[var(--sea-ink)] mb-2"
-        >
+        <Label htmlFor="creatorName">
           Your Name (you'll be the Scrum Master)
-        </label>
-        <input
+        </Label>
+        <Input
           id="creatorName"
           type="text"
           value={creatorName}
           onChange={(e) => setCreatorName(e.target.value)}
           placeholder="Enter your name"
-          className="w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
           required
         />
       </div>

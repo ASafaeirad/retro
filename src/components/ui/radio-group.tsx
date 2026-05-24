@@ -29,6 +29,7 @@ function RadioGroupItem({
         "flex rounded-full text-main-foreground bg-white border-2 border-border shadow-shadow transition-all transition-200 flex-1 cursor-pointer",
         "data-[state=checked]:translate-x-boxShadowX data-[state=checked]:translate-y-boxShadowY data-[state=checked]:shadow-none data-[state=checked]:bg-main",
         "size-12",
+        "focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:outline-hidden",
         className,
       )}
       {...props}

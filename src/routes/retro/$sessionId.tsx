@@ -20,6 +20,7 @@ import { ParticipantList } from "#components/ParticipantList.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
 import { Timer } from "#components/Timer.tsx";
+import { Input } from "#components/ui/input.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
@@ -669,12 +670,11 @@ function RetroBoard() {
 
               {isScrumMaster && !session.voteLimit && (
                 <div className="mt-4 flex gap-2">
-                  <input
+                  <Input
                     type="number"
                     value={newVoteLimit}
                     onChange={(e) => setNewVoteLimit(e.target.value)}
                     placeholder="Votes per person"
-                    className="rounded-md border bg-white px-3 py-2 text-sm "
                     min="1"
                   />
                   <Button onClick={handleSetvoteLimit} disabled={!newVoteLimit}>

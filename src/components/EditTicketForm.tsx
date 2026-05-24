@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
+import { Input } from "./ui/input";
 
 interface EditTicketFormProps {
   initialText: string;
@@ -51,12 +52,11 @@ export function EditTicketForm({
         disabled={isSubmitting}
       />
 
-      <input
+      <Input
         type="url"
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
         placeholder="Image URL (optional)"
-        className="mb-3 w-full rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
         disabled={isSubmitting}
       />
 

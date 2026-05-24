@@ -12,6 +12,7 @@ import {
   getStoredSession,
   storeSession,
 } from "../lib/participantAuth";
+import { Input } from "./ui/input";
 
 export function JoinForm({ sessionId }: { sessionId: Id<"sessions"> }) {
   const navigate = useNavigate();
@@ -69,12 +70,11 @@ export function JoinForm({ sessionId }: { sessionId: Id<"sessions"> }) {
 
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <input
+            <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="mb-4 w-full rounded-md border  bg-white dark: px-4 py-3 text-sm  placeholder: focus: focus:outline-none focus:ring-1 focus:"
               autoFocus
               required
             />
