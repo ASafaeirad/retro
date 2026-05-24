@@ -6,7 +6,12 @@ import { Badge } from "#components/ui/badge.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
-import { allMoods, type Mood, moodEmojis, toMood } from "#models/mood.model.ts";
+import {
+  allMoods,
+  type Mood,
+  moodEmojis,
+  toMood,
+} from "#models/mood.model.tsx";
 import { Button } from "#ui/button.tsx";
 
 interface Participant {

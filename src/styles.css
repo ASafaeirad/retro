@@ -61,3 +61,7 @@
     @apply font-heading;
   }
 }
+
+.pixelated {
+  image-rendering: pixelated;
+}

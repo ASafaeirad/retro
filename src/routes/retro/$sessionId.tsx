@@ -15,7 +15,7 @@ import { AddTicketForm } from "#components/AddTicketForm.tsx";
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { DraggableTicketCard } from "#components/DraggableTicketCard.tsx";
 import { EditTicketForm } from "#components/EditTicketForm.tsx";
-import { MoodSelector } from "#components/MoodSelector.tsx";
+import { MoodPicker } from "#components/MoodPicker.tsx";
 import { ParticipantList } from "#components/ParticipantList.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
@@ -23,7 +23,7 @@ import { Timer } from "#components/Timer.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
-import type { Mood } from "#models/mood.model.ts";
+import type { Mood } from "#models/mood.model.tsx";
 import { Button } from "#ui/button.tsx";
 import {
   clearSession,
@@ -1033,7 +1033,7 @@ function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
             autoFocus
             required
           />
-          <MoodSelector value={mood} onChange={setMood} />
+          <MoodPicker value={mood} onChange={setMood} />
           <Button
             type="submit"
             disabled={!name.trim() || isJoining}
