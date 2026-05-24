@@ -16,7 +16,8 @@ const buttonVariants = cva(
       variant: {
         default:
           "text-main-foreground bg-main border-2 border-border cursor-pointer",
-        neutral:
+        neutral: "bg-white text-foreground border-2 border-border ",
+        secondary:
           "bg-secondary-background text-foreground border-2 border-border ",
         danger: "bg-danger border-2 border-border",
       },

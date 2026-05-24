@@ -26,7 +26,7 @@ function RadioGroupItem({
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
-        "flex rounded-full text-main-foreground bg-secondary-background border-2 border-border shadow-shadow transition-all transition-200 flex-1 cursor-pointer",
+        "flex rounded-full text-main-foreground bg-white border-2 border-border shadow-shadow transition-all transition-200 flex-1 cursor-pointer",
         "data-[state=checked]:translate-x-boxShadowX data-[state=checked]:translate-y-boxShadowY data-[state=checked]:shadow-none data-[state=checked]:bg-main",
         "size-12",
         className,
