@@ -12,8 +12,12 @@ export const SessionList = ({
   children?: React.ReactNode;
   title: string;
 }) => {
+  if (sessions.length === 0) {
+    return null;
+  }
+
   return (
-    <div>
+    <div className="bg-secondary-background">
       <div className="flex justify-between mx-6 py-4">
         <h2 className="text-xl uppercase">{title}</h2>
         {children}
@@ -25,6 +29,7 @@ export const SessionList = ({
           <SessionCard key={session._id} session={session} />
         ))}
       </div>
+      <hr className="border-t-0 border-b-2" />
     </div>
   );
 };
