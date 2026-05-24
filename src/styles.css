@@ -4,14 +4,14 @@
 :root {
   font-family: "Russo One", sans-serif;
   --background: oklch(95.31% 0.0496 169.04);
-  --body: oklch(80.946% 0.08182 98.576);
+  --body: oklch(84.324% 0.07519 86.727);
   --secondary-background: oklch(89.08% 0.13154 88.227);
   --foreground: oklch(19.872% 0.01774 37.303);
   --fg-muted: oklch(0% 0 0 / 0.6);
   --bg-muted: oklch(72.516% 0.00008 271.152);
   --card: oklch(100% 0 0);
   --main-foreground: oklch(0% 0 0);
-  --main: oklch(84.133% 0.13277 75.386);
+  --main: oklch(78.929% 0.12594 200.786);
   --border: oklch(0% 0 0);
   --border-muted: oklch(0% 0 0 / 0.2);
   --danger: #FF4D50;

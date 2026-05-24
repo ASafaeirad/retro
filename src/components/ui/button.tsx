@@ -5,7 +5,7 @@ import { cn, join } from "#lib/cn";
 
 const buttonVariants = cva(
   join(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-base text-sm font-base",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-base text-sm font-base cursor-pointer",
     "ring-offset-white transition-all gap-2",
     "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2",
@@ -13,12 +13,15 @@ const buttonVariants = cva(
   ),
   {
     variants: {
+      full: {
+        true: "w-full",
+      },
       variant: {
         default:
           "text-main-foreground bg-main border-2 border-border cursor-pointer",
-        neutral: "bg-white text-foreground border-2 border-border ",
+        neutral: "bg-white text-foreground border-2 border-border",
         secondary:
-          "bg-secondary-background text-foreground border-2 border-border ",
+          "bg-secondary-background text-foreground border-2 border-border",
         danger: "bg-danger border-2 border-border",
       },
       shadow: {
@@ -50,6 +53,7 @@ export function Button({
   size,
   asChild = false,
   shadow,
+  full,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -61,7 +65,7 @@ export function Button({
     <Comp
       data-slot="button"
       type="button"
-      className={cn(buttonVariants({ variant, size, shadow, className }))}
+      className={cn(buttonVariants({ variant, size, shadow, className, full }))}
       {...props}
     />
   );

@@ -2,7 +2,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { useState } from "react";
 import { MoodPicker } from "#components/MoodPicker.tsx";
-import { Card, CardContent, CardHeader } from "#components/ui/card.tsx";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "#components/ui/card.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import type { Mood } from "#models/mood.model.tsx";
@@ -13,6 +18,7 @@ import {
   storeSession,
 } from "../lib/participantAuth";
 import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 export function JoinForm({ sessionId }: { sessionId: Id<"sessions"> }) {
   const navigate = useNavigate();
@@ -21,32 +27,18 @@ export function JoinForm({ sessionId }: { sessionId: Id<"sessions"> }) {
   const [mood, setMood] = useState<Mood>();
   const [isJoining, setIsJoining] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!name.trim() || isJoining) return;
+    if (!name || isJoining) return;
 
     setIsJoining(true);
     try {
-      // Check for stored session token (for rejoin scenario) or generate new one
       const stored = getStoredSession(sessionId);
       const token = stored?.token || generateToken();
 
-      // Call joinSession mutation with token and mood
-      await joinSession({
-        sessionId,
-        name: name.trim(),
-        sessionToken: token,
-        mood,
-      });
-
-      // Store session credentials in localStorage
+      await joinSession({ sessionId, name, sessionToken: token, mood });
       storeSession(sessionId, name.trim(), token, mood);
-
-      // Navigate to the session
-      navigate({
-        to: `/retro/${sessionId}`,
-        search: { name: name.trim() },
-      });
+      navigate({ to: `/retro/${sessionId}`, search: { name } });
     } catch (error) {
       console.error("Failed to join session:", error);
       alert(
@@ -62,39 +54,43 @@ export function JoinForm({ sessionId }: { sessionId: Id<"sessions"> }) {
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card variant="main">
         <CardHeader className="justify-start">
-          <h2>Enter Your Name</h2>
+          <h2 className="text-xl">Enter Your Name</h2>
           <p className="text-sm">
             Please enter your name to join this retro session
           </p>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <Input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              autoFocus
-              required
-            />
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <Label className="flex flex-col gap-2">
+              <span>Your Name</span>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value.trim())}
+                placeholder="Your name"
+                autoFocus
+                required
+              />
+            </Label>
             <MoodPicker value={mood} onChange={setMood} />
-            <Button
-              type="submit"
-              disabled={!name.trim() || isJoining}
-              className="w-full"
-            >
-              {isJoining ? "Joining..." : "Join Session"}
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="submit"
+                disabled={!name || isJoining}
+                className="w-full"
+              >
+                {isJoining ? "Joining..." : "Join Session"}
+              </Button>
+              <Button
+                onClick={() => navigate({ to: "/" })}
+                variant="neutral"
+                full
+              >
+                Back to Sessions
+              </Button>
+            </div>
           </form>
-
-          <Button
-            onClick={() => navigate({ to: "/" })}
-            variant="neutral"
-            className="mt-4 w-full"
-          >
-            Back to Sessions
-          </Button>
         </CardContent>
       </Card>
     </div>
