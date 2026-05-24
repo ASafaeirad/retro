@@ -1,5 +1,5 @@
+import type { Id } from "#convex/models";
 import type { Mood } from "#models/mood.model.ts";
-import type { Id } from "../../convex/_generated/dataModel";
 
 interface StoredSession {
   name: string;

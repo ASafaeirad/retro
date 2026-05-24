@@ -1,7 +1,7 @@
 import { useState } from "react";
+import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
-import type { Id } from "../../../convex/_generated/dataModel";
 
 interface ActionItem {
   _id: Id<"actionItems">;

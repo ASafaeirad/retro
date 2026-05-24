@@ -1,11 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
-import { SessionList } from "#components/retro/SessionList.tsx";
+import { SessionList } from "#components/SessionList.tsx";
 import { api } from "#convex/api";
 import { Button } from "#ui/button.tsx";
 import { Logo } from "../components/Logo.tsx";
-import { generateToken, storeSession } from "../lib/participantAuth";
+import { generateToken, storeSession } from "../lib/participantAuth.ts";
 
 export const Route = createFileRoute("/")({
   component: RetroSessionsPage,

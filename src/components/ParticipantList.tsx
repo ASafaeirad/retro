@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Avatar, AvatarFallback } from "#components/ui/avatar.tsx";
 import { Badge } from "#components/ui/badge.tsx";
 import { api } from "#convex/api";
+import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import { allMoods, type Mood, moodEmojis, toMood } from "#models/mood.model.ts";
 import { Button } from "#ui/button.tsx";
-import type { Id } from "../../../convex/_generated/dataModel";
 
 interface Participant {
   _id: Id<"participants">;

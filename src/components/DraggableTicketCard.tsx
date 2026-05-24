@@ -1,6 +1,6 @@
 import { useDraggable, useDroppable } from "@dnd-kit/react";
+import type { Id } from "#convex/models";
 import { TicketCard } from "./TicketCard";
-import type { Id } from "../../../convex/_generated/dataModel";
 
 interface DraggableTicketCardProps {
   id: Id<"tickets">;

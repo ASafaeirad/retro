@@ -1,7 +1,7 @@
 import { Edit, Trash } from "lucide-react";
+import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
-import type { Id } from "../../../convex/_generated/dataModel";
 
 interface TicketCardProps {
   id: Id<"tickets">;

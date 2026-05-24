@@ -10,21 +10,21 @@ import {
 } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { ActionItemPanel } from "#components/retro/ActionItemPanel.tsx";
-import { AddTicketForm } from "#components/retro/AddTicketForm.tsx";
-import { BoardColumn } from "#components/retro/BoardColumn.tsx";
-import { DraggableTicketCard } from "#components/retro/DraggableTicketCard.tsx";
-import { EditTicketForm } from "#components/retro/EditTicketForm.tsx";
-import { MoodSelector } from "#components/retro/MoodSelector.tsx";
-import { ParticipantList } from "#components/retro/ParticipantList.tsx";
-import { PhaseControls } from "#components/retro/PhaseControls.tsx";
-import { TicketCard } from "#components/retro/TicketCard.tsx";
-import { Timer } from "#components/retro/Timer.tsx";
+import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
+import { AddTicketForm } from "#components/AddTicketForm.tsx";
+import { BoardColumn } from "#components/BoardColumn.tsx";
+import { DraggableTicketCard } from "#components/DraggableTicketCard.tsx";
+import { EditTicketForm } from "#components/EditTicketForm.tsx";
+import { MoodSelector } from "#components/MoodSelector.tsx";
+import { ParticipantList } from "#components/ParticipantList.tsx";
+import { PhaseControls } from "#components/PhaseControls.tsx";
+import { TicketCard } from "#components/TicketCard.tsx";
+import { Timer } from "#components/Timer.tsx";
 import { api } from "#convex/api";
+import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import type { Mood } from "#models/mood.model.ts";
 import { Button } from "#ui/button.tsx";
-import type { Id } from "../../../convex/_generated/dataModel";
 import {
   clearSession,
   generateToken,
@@ -451,7 +451,7 @@ function RetroBoard() {
               {currentParticipant && (
                 <Button
                   onClick={handleToggleReady}
-                  variant={currentParticipant.isReady ? "reverse" : "default"}
+                  shadow={currentParticipant.isReady ? "reverse" : "default"}
                   className="mt-4"
                 >
                   {currentParticipant.isReady ? "✓ Ready" : "Mark as Ready"}
@@ -708,7 +708,7 @@ function RetroBoard() {
                             type="button"
                             onClick={() => handleVote(undefined, group._id)}
                             size="sm"
-                            variant={hasVoted ? "reverse" : "default"}
+                            shadow={hasVoted ? "reverse" : "default"}
                           >
                             {hasVoted ? "Withdraw" : "Vote"} ({group.voteLimit})
                           </Button>
