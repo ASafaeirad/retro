@@ -15,7 +15,7 @@ import { AddTicketForm } from "#components/AddTicketForm.tsx";
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { DraggableTicketCard } from "#components/DraggableTicketCard.tsx";
 import { EditTicketForm } from "#components/EditTicketForm.tsx";
-import { MoodPicker } from "#components/MoodPicker.tsx";
+import { JoinForm } from "#components/JoinForm.tsx";
 import { ParticipantList } from "#components/ParticipantList.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
@@ -23,14 +23,8 @@ import { Timer } from "#components/Timer.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
-import type { Mood } from "#models/mood.model.tsx";
 import { Button } from "#ui/button.tsx";
-import {
-  clearSession,
-  generateToken,
-  getStoredSession,
-  storeSession,
-} from "../../lib/participantAuth";
+import { clearSession, getStoredSession } from "../../lib/participantAuth";
 
 export const Route = createFileRoute("/retro/$sessionId")({
   component: RetroBoard,
@@ -189,7 +183,7 @@ function RetroBoard() {
 
   // Name entry if not set
   if (!name) {
-    return <NameEntryScreen sessionId={sessionId as Id<"sessions">} />;
+    return <JoinForm sessionId={sessionId as Id<"sessions">} />;
   }
 
   if (!session || !participants || !tickets) {
@@ -971,86 +965,3 @@ function RetroBoard() {
 }
 
 // Name entry screen component
-function NameEntryScreen({ sessionId }: { sessionId: Id<"sessions"> }) {
-  const navigate = useNavigate();
-  const joinSession = useMutation(api.retro.joinSession);
-  const [name, setName] = useState("");
-  const [mood, setMood] = useState<Mood>();
-  const [isJoining, setIsJoining] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || isJoining) return;
-
-    setIsJoining(true);
-    try {
-      // Check for stored session token (for rejoin scenario) or generate new one
-      const stored = getStoredSession(sessionId);
-      const token = stored?.token || generateToken();
-
-      // Call joinSession mutation with token and mood
-      await joinSession({
-        sessionId,
-        name: name.trim(),
-        sessionToken: token,
-        mood,
-      });
-
-      // Store session credentials in localStorage
-      storeSession(sessionId, name.trim(), token, mood);
-
-      // Navigate to the session
-      navigate({
-        to: `/retro/${sessionId}`,
-        search: { name: name.trim() },
-      });
-    } catch (error) {
-      console.error("Failed to join session:", error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : "Failed to join session. Name might already be taken.",
-      );
-      setIsJoining(false);
-    }
-  };
-
-  return (
-    <div className="flex min-h-screen items-center justify-center  px-4">
-      <div className="w-full max-w-md rounded-lg border   p-8">
-        <h2 className="mb-4 text-2xl font-bold ">Enter Your Name</h2>
-        <p className="mb-6 text-sm ">
-          Please enter your name to join this retro session
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            className="mb-4 w-full rounded-md border  bg-white dark: px-4 py-3 text-sm  placeholder: focus: focus:outline-none focus:ring-1 focus:"
-            autoFocus
-            required
-          />
-          <MoodPicker value={mood} onChange={setMood} />
-          <Button
-            type="submit"
-            disabled={!name.trim() || isJoining}
-            className="w-full"
-          >
-            {isJoining ? "Joining..." : "Join Session"}
-          </Button>
-        </form>
-
-        <Button
-          onClick={() => navigate({ to: "/" })}
-          variant="neutral"
-          className="mt-4 w-full"
-        >
-          Back to Sessions
-        </Button>
-      </div>
-    </div>
-  );
-}
