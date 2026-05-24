@@ -544,7 +544,7 @@ export const removeVote = mutation({
   },
 })
 
-export const setvoteLimit = mutation({
+export const setVoteLimit = mutation({
   args: {
     sessionId: v.id('sessions'),
     voteLimit: v.number(),

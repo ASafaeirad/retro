@@ -73,6 +73,7 @@ export function ParticipantList({
           const isActive = isParticipantActive(participant.lastActiveAt);
           const isCurrentUser = participant.name === currentUserName;
           const mood = toMood(participant.mood);
+          const Mood = moodEmojis[mood];
 
           return (
             <div
@@ -89,18 +90,25 @@ export function ParticipantList({
             >
               {isCurrentUser && editingMoodFor === participant.name ? (
                 <div className="flex gap-1">
-                  {allMoods.map((option) => (
-                    <Button
-                      key={option}
-                      type="button"
-                      variant="neutral"
-                      size="sm"
-                      onClick={() => handleMoodChange(participant.name, option)}
-                      title={option}
-                    >
-                      {moodEmojis[option]}
-                    </Button>
-                  ))}
+                  {allMoods
+                    .filter((m) => m !== "Unknown")
+                    .map((option) => {
+                      const Mood = moodEmojis[toMood(option)];
+                      return (
+                        <Button
+                          key={option}
+                          type="button"
+                          variant="neutral"
+                          size="sm"
+                          onClick={() =>
+                            handleMoodChange(participant.name, option)
+                          }
+                          title={option}
+                        >
+                          <Mood />
+                        </Button>
+                      );
+                    })}
                   {participant.mood && (
                     <Button
                       type="button"
@@ -129,7 +137,9 @@ export function ParticipantList({
                         : "Previous sprint mood"
                     }
                   >
-                    <AvatarFallback>{moodEmojis[mood]}</AvatarFallback>
+                    <AvatarFallback>
+                      <Mood />
+                    </AvatarFallback>
                   </Avatar>
                   <span className={cn("text-sm")}>{participant.name}</span>
                   {participant.name === scrumMaster && (
