@@ -38,5 +38,4 @@ export const allMoods: Mood[] = [
   "Happy",
   "Laugh",
   "Neutral",
-  "Unknown",
 ];

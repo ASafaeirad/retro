@@ -16,22 +16,20 @@ export function MoodPicker({ value, onChange }: MoodSelectorProps) {
         onValueChange={onChange}
         className="flex w-full justify-between"
       >
-        {allMoods
-          .filter((mood) => mood !== "Unknown")
-          .map((option) => {
-            const EmojiComponent = moodEmojis[option];
-            return (
-              <div key={option} className="flex items-center gap-2">
-                <RadioGroupItem
-                  className="justify-center items-center"
-                  value={option}
-                  id={option}
-                >
-                  <EmojiComponent className="size-9 pixelated cursor-pointer" />
-                </RadioGroupItem>
-              </div>
-            );
-          })}
+        {allMoods.map((option) => {
+          const EmojiComponent = moodEmojis[option];
+          return (
+            <div key={option} className="flex items-center gap-2">
+              <RadioGroupItem
+                className="justify-center items-center"
+                value={option}
+                id={option}
+              >
+                <EmojiComponent className="size-9 pixelated cursor-pointer" />
+              </RadioGroupItem>
+            </div>
+          );
+        })}
       </RadioGroup>
     </div>
   );
