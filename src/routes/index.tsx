@@ -6,7 +6,6 @@ import type { Session } from "#models/session.ts";
 
 import { Button } from "#ui/button.tsx";
 import { Card, CardAction, CardContent } from "#ui/card.tsx";
-import type { Id } from "../../convex/_generated/dataModel";
 import { Logo } from "../components/Logo.tsx";
 import { generateToken, storeSession } from "../lib/participantAuth";
 
@@ -64,50 +63,30 @@ function RetroSessionsPage() {
   const completedSessions = sessions.filter((s) => !s.isActive);
 
   return (
-    <div className="min-h-screen py-6 px-4 mx-auto max-w-4xl">
-      <header className="mb-8 flex justify-center">
+    <div className="min-h-screen border-x-2 border-border mx-auto max-w-4xl">
+      <header className="flex p-2 justify-center">
         <Logo className="h-10 w-auto" />
       </header>
-      <hr className="mb-8" />
+      <hr className="border-t-0 border-b-2" />
 
-      {isCreating && (
-        <CreateSessionModal
-          onClose={() => setIsCreating(false)}
-          onCreate={handleCreateSession}
-        />
-      )}
+      <div className="px-6">
+        {isCreating && (
+          <CreateSessionModal
+            onClose={() => setIsCreating(false)}
+            onCreate={handleCreateSession}
+          />
+        )}
+      </div>
 
-      {/* Active sessions */}
       {activeSessions.length > 0 && (
-        <div className="mb-8">
-          <div className="flex justify-between mb-4">
-            <h2 className="text-xl">Active Sessions</h2>
-            <Button type="button" onClick={() => setIsCreating(true)}>
-              + Create New Session
-            </Button>
-          </div>
-
-          <div className="space-y-3">
-            {activeSessions.map((session) => (
-              <SessionCard key={session._id} session={session} />
-            ))}
-          </div>
-        </div>
+        <SessionList sessions={activeSessions} title="Active Sessions">
+          <Button size="sm" onClick={() => setIsCreating(true)}>
+            + Create
+          </Button>
+        </SessionList>
       )}
-      <hr className="mb-8" />
-      {/* Completed sessions */}
-      {completedSessions.length > 0 && (
-        <div>
-          <h2 className="mb-4 text-xl font-semibold text-[var(--sea-ink)]">
-            Completed Sessions
-          </h2>
-          <div className="space-y-3">
-            {completedSessions.map((session) => (
-              <SessionCard key={session._id} session={session} />
-            ))}
-          </div>
-        </div>
-      )}
+      <hr className="border-t-0 border-b-2" />
+      <SessionList sessions={completedSessions} title="Completed Sessions" />
 
       {sessions.length === 0 && (
         <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-8 text-center">
@@ -197,33 +176,43 @@ export const CreateSessionModal = ({
   );
 };
 
+export const SessionList = ({
+  sessions,
+  children,
+  title,
+}: {
+  sessions: Session[];
+  children?: React.ReactNode;
+  title: string;
+}) => {
+  return (
+    <div>
+      <div className="flex justify-between mx-6 py-4">
+        <h2 className="text-xl">{title}</h2>
+        {children}
+      </div>
+      <hr className="border-muted" />
+
+      <div className="gap-3 py-6 mx-6">
+        {sessions.map((session) => (
+          <SessionCard key={session._id} session={session} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const SessionCard = ({ session }: { session: Session }) => {
-  const joinSession = useMutation(api.retro.joinSession);
   const navigate = useNavigate();
 
-  const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
-
-  const handleJoinSession = async (sessionId: string, name: string) => {
-    if (!name) return;
-
+  const handleJoinSession = async () => {
     try {
-      const token = generateToken();
-      await joinSession({
-        sessionId: sessionId as Id<"sessions">,
-        name,
-        sessionToken: token,
-      });
-
-      storeSession(sessionId as Id<"sessions">, name, token);
-      navigate({ to: `/retro/${sessionId}`, search: { name } });
+      navigate({ to: `/retro/${session._id}` });
     } catch (error) {
       console.error("Failed to join session:", error);
       alert("Failed to join session. Name might already be taken.");
     }
   };
-
-  const isJoiningSession = joiningSessionId === session._id;
-  console.log(session.phase);
 
   return (
     <Card className="py-3" key={session._id}>
@@ -232,59 +221,14 @@ export const SessionCard = ({ session }: { session: Session }) => {
         <CardAction>
           <Button
             variant={!session.isActive ? "neutral" : "default"}
+            size="sm"
             shadow="reverse"
-            onClick={() => setJoiningSessionId(session._id)}
+            onClick={handleJoinSession}
           >
-            Join Session
+            Join
           </Button>
         </CardAction>
-        {isJoiningSession && (
-          <QuickJoinForm
-            onClose={() => setJoiningSessionId(null)}
-            onJoin={(name) => handleJoinSession(session._id, name)}
-          />
-        )}
       </CardContent>
     </Card>
-  );
-};
-
-export const QuickJoinForm = ({
-  onJoin,
-  onClose,
-}: {
-  onJoin?: (name: string) => void;
-  onClose?: () => void;
-}) => {
-  const [name, setName] = useState("");
-
-  return (
-    <div className="flex gap-2 items-center">
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value.trim())}
-        placeholder="Your name"
-        className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
-        autoFocus
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            onJoin?.(name.trim());
-          }
-        }}
-      />
-      <Button onClick={() => onJoin?.(name.trim())} disabled={!name.trim()}>
-        Join
-      </Button>
-      <Button
-        onClick={() => {
-          setName("");
-          onClose?.();
-        }}
-        variant="neutral"
-      >
-        Cancel
-      </Button>
-    </div>
   );
 };
