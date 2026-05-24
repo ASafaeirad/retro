@@ -1,5 +1,6 @@
-import { mutation, query } from './_generated/server'
+import type { Participant } from '#models/participant'
 import { v } from 'convex/values'
+import { mutation, query } from './_generated/server'
 
 // ===== QUERIES =====
 
@@ -45,11 +46,13 @@ export const getSession = query({
 export const getParticipants = query({
   args: { sessionId: v.id('sessions') },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const participants = await ctx.db
       .query('participants')
       .withIndex('sessionId', (q) => q.eq('sessionId', args.sessionId))
       .order('asc')
       .collect()
+
+    return participants as Participant[]
   },
 })
 

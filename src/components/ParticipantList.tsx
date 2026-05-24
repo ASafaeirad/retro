@@ -6,21 +6,9 @@ import { Badge } from "#components/ui/badge.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
-import {
-  allMoods,
-  type Mood,
-  moodEmojis,
-  toMood,
-} from "#models/mood.model.tsx";
+import { allMoods, moodEmojis, toMood } from "#models/mood.model.tsx";
+import type { Participant } from "#models/participant.ts";
 import { Button } from "#ui/button.tsx";
-
-interface Participant {
-  _id: Id<"participants">;
-  name: string;
-  isReady: boolean;
-  lastActiveAt: number;
-  mood?: Mood;
-}
 
 interface ParticipantListProps {
   participants: Participant[];
