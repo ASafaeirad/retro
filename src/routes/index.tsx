@@ -2,7 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "#convex/api";
+import { Badge } from "#ui/badge.tsx";
 import { Button } from "#ui/button.tsx";
+import { Card, CardAction, CardContent, CardHeader } from "#ui/card.tsx";
 import type { Id } from "../../convex/_generated/dataModel";
 import { Logo } from "../components/Logo.tsx";
 import { generateToken, storeSession } from "../lib/participantAuth";
@@ -15,16 +17,16 @@ function RetroSessionsPage() {
   const navigate = useNavigate();
   const sessions = useQuery(api.retro.listSessions, { includeCompleted: true });
   const createSession = useMutation(api.retro.createSession);
-  const joinSession = useMutation(api.retro.joinSession);
 
   const [isCreating, setIsCreating] = useState(false);
-  const [sprintNumber, setSprintNumber] = useState("");
-  const [creatorName, setCreatorName] = useState("");
 
-  const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
-  const [joinName, setJoinName] = useState("");
-
-  const handleCreateSession = async () => {
+  const handleCreateSession = async ({
+    sprintNumber,
+    creatorName,
+  }: {
+    sprintNumber: string;
+    creatorName: string;
+  }) => {
     if (!sprintNumber || !creatorName.trim()) return;
 
     try {
@@ -46,31 +48,6 @@ function RetroSessionsPage() {
     } catch (error) {
       console.error("Failed to create session:", error);
       alert("Failed to create session. Please try again.");
-    }
-  };
-
-  const handleJoinSession = async (sessionId: string) => {
-    if (!joinName.trim()) return;
-
-    try {
-      const token = generateToken();
-      await joinSession({
-        sessionId: sessionId as Id<"sessions">,
-        name: joinName.trim(),
-        sessionToken: token,
-      });
-
-      // Store session credentials in localStorage
-      storeSession(sessionId as Id<"sessions">, joinName.trim(), token);
-
-      // Navigate to the session
-      navigate({
-        to: `/retro/${sessionId}`,
-        search: { name: joinName.trim() },
-      });
-    } catch (error) {
-      console.error("Failed to join session:", error);
-      alert("Failed to join session. Name might already be taken.");
     }
   };
 
@@ -111,62 +88,7 @@ function RetroSessionsPage() {
 
           <div className="space-y-3">
             {activeSessions.map((session) => (
-              <div
-                key={session._id}
-                className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-[var(--sea-ink)]">
-                      Sprint {session.sprintNumber}
-                    </h3>
-                    <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                      Phase: {session.phase.replace("_", " ")} •{" "}
-                      {session.participantCount} participants
-                    </p>
-                    <p className="text-xs text-[var(--sea-ink-soft)] mt-1">
-                      Scrum Master: {session.createdBy}
-                    </p>
-                  </div>
-
-                  {joiningSessionId === session._id ? (
-                    <div className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        value={joinName}
-                        onChange={(e) => setJoinName(e.target.value)}
-                        placeholder="Your name"
-                        className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleJoinSession(session._id);
-                          }
-                        }}
-                      />
-                      <Button
-                        onClick={() => handleJoinSession(session._id)}
-                        disabled={!joinName.trim()}
-                      >
-                        Join
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setJoiningSessionId(null);
-                          setJoinName("");
-                        }}
-                        variant="neutral"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button onClick={() => setJoiningSessionId(session._id)}>
-                      Join Session
-                    </Button>
-                  )}
-                </div>
-              </div>
+              <SessionCard key={session._id} session={session} />
             ))}
           </div>
         </div>
@@ -223,13 +145,22 @@ export const CreateSessionModal = ({
   onCreate,
 }: {
   onClose?: () => void;
-  onCreate?: () => void;
+  onCreate?: ({
+    sprintNumber,
+    creatorName,
+  }: {
+    sprintNumber: string;
+    creatorName: string;
+  }) => void;
 }) => {
   const [sprintNumber, setSprintNumber] = useState("");
   const [creatorName, setCreatorName] = useState("");
 
   return (
-    <form onSubmit={onCreate} className="space-y-4 mb-8">
+    <form
+      onSubmit={() => onCreate?.({ sprintNumber, creatorName })}
+      className="space-y-4 mb-8"
+    >
       <div>
         <label
           htmlFor="sprintNumber"
@@ -283,5 +214,105 @@ export const CreateSessionModal = ({
         </Button>
       </div>
     </form>
+  );
+};
+
+export const SessionCard = ({
+  session,
+}: {
+  session: {
+    _id: string;
+    sprintNumber: number;
+    phase: string;
+    participantCount: number;
+    createdBy: string;
+  };
+}) => {
+  const joinSession = useMutation(api.retro.joinSession);
+  const navigate = useNavigate();
+
+  const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
+
+  const handleJoinSession = async (sessionId: string, name: string) => {
+    if (!name) return;
+
+    try {
+      const token = generateToken();
+      await joinSession({
+        sessionId: sessionId as Id<"sessions">,
+        name,
+        sessionToken: token,
+      });
+
+      storeSession(sessionId as Id<"sessions">, name, token);
+      navigate({ to: `/retro/${sessionId}`, search: { name } });
+    } catch (error) {
+      console.error("Failed to join session:", error);
+      alert("Failed to join session. Name might already be taken.");
+    }
+  };
+
+  const isJoiningSession = joiningSessionId === session._id;
+
+  return (
+    <Card className="py-3" key={session._id}>
+      <CardContent className="flex justify-between items-center">
+        <h3 className="flex-1">Sprint {session.sprintNumber}</h3>
+        <CardAction>
+          <Button
+            shadow="reverse"
+            onClick={() => setJoiningSessionId(session._id)}
+          >
+            Join Session
+          </Button>
+        </CardAction>
+        {isJoiningSession && (
+          <QuickJoinForm
+            onClose={() => setJoiningSessionId(null)}
+            onJoin={(name) => handleJoinSession(session._id, name)}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export const QuickJoinForm = ({
+  onJoin,
+  onClose,
+}: {
+  onJoin?: (name: string) => void;
+  onClose?: () => void;
+}) => {
+  const [name, setName] = useState("");
+
+  return (
+    <div className="flex gap-2 items-center">
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value.trim())}
+        placeholder="Your name"
+        className="rounded-md border border-[var(--line)] bg-white dark:bg-[var(--foam)] px-3 py-2 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] focus:border-[var(--lagoon)] focus:outline-none focus:ring-1 focus:ring-[var(--lagoon)]"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onJoin?.(name.trim());
+          }
+        }}
+      />
+      <Button onClick={() => onJoin?.(name.trim())} disabled={!name.trim()}>
+        Join
+      </Button>
+      <Button
+        onClick={() => {
+          setName("");
+          onClose?.();
+        }}
+        variant="neutral"
+      >
+        Cancel
+      </Button>
+    </div>
   );
 };

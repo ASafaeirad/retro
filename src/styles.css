@@ -6,6 +6,7 @@
   --secondary-background: oklch(100% 0 0);
   --foreground: oklch(0% 0 0);
   --fg-muted: oklch(0% 0 0 / 0.6);
+  --card: oklch(100% 0 0);
   --main-foreground: oklch(0% 0 0);
   --main: oklch(77.54% 0.1681 162.78);
   --border: oklch(0% 0 0);
@@ -37,6 +38,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-card: var(--card);
 
   --spacing-boxShadowX: 4px;
   --spacing-boxShadowY: 4px;
