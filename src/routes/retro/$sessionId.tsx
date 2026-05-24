@@ -7,8 +7,8 @@ import {
 import { useState } from "react";
 import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
-import { ParticipantList } from "#components/ParticipantList.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
+import { ParticipantList } from "#components/participant-list/ParticipantList.tsx";
 import type { Id } from "#convex/models";
 import { clearSession } from "../../lib/participantAuth";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
@@ -374,7 +374,7 @@ function RetroBoard() {
             }
           />
 
-          {isScrumMaster && (
+          {/* {isScrumMaster && (
             <PhaseControls
               currentPhase={session.phase}
               onPhaseChange={handlePhaseChange}
@@ -400,12 +400,12 @@ function RetroBoard() {
                   : undefined
               }
             />
-          )}
+          )} */}
         </div>
 
-        <div className="flex gap-6">
+        {/* <div className="flex gap-6">
           <div className="flex-1">{renderPhaseContent()}</div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

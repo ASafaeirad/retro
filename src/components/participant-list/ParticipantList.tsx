@@ -1,14 +1,14 @@
 import { useConvexMutation } from "@convex-dev/react-query";
 import { Crosshair } from "lucide-react";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "#components/ui/avatar.tsx";
 import { Badge } from "#components/ui/badge.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
-import { allMoods, moodEmojis, toMood } from "#models/mood.model.tsx";
+import { toMood } from "#models/mood.model.tsx";
 import type { Participant } from "#models/participant.ts";
 import { Button } from "#ui/button.tsx";
+import { ParticipantMood } from "./ParticipantMood";
 
 interface ParticipantListProps {
   participants: Participant[];
@@ -39,14 +39,13 @@ export function ParticipantList({
   onRemoveParticipant,
   className,
 }: ParticipantListProps) {
-  const isScrumMaster = currentUserName === scrumMaster;
   const updateMood = useConvexMutation(api.retro.updateParticipantMood);
-  const [editingMoodFor, setEditingMoodFor] = useState<string | null>(null);
+  const [editingMoodFor, setEditingMoodFor] = useState<string>();
 
   const handleMoodChange = async (participantName: string, mood?: string) => {
     try {
       await updateMood({ sessionId, participantName, mood });
-      setEditingMoodFor(null);
+      setEditingMoodFor(undefined);
     } catch (error) {
       console.error("Failed to update mood:", error);
     }
@@ -61,8 +60,8 @@ export function ParticipantList({
           const isActive = isParticipantActive(participant.lastActiveAt);
           const isCurrentUser = participant.name === currentUserName;
           const mood = toMood(participant.mood);
-          const Mood = moodEmojis[mood];
 
+          const isScrumMaster = participant.name === scrumMaster;
           return (
             <div
               key={participant._id}
@@ -76,65 +75,22 @@ export function ParticipantList({
                 },
               )}
             >
-              {isCurrentUser && editingMoodFor === participant.name ? (
-                <div className="flex gap-1">
-                  {allMoods
-                    .filter((m) => m !== "Unknown")
-                    .map((option) => {
-                      const Mood = moodEmojis[toMood(option)];
-                      return (
-                        <Button
-                          key={option}
-                          type="button"
-                          variant="neutral"
-                          size="sm"
-                          onClick={() =>
-                            handleMoodChange(participant.name, option)
-                          }
-                          title={option}
-                        >
-                          <Mood />
-                        </Button>
-                      );
-                    })}
-                  {participant.mood && (
-                    <Button
-                      type="button"
-                      variant="neutral"
-                      size="sm"
-                      onClick={() =>
-                        handleMoodChange(participant.name, undefined)
-                      }
-                      title="Remove mood"
-                    >
-                      ✕
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="flex flex-1 gap-2 items-center">
-                  <Avatar
-                    className={cn({ "cursor-pointer": isCurrentUser })}
-                    onClick={() => {
-                      if (!isCurrentUser) return;
-                      setEditingMoodFor(participant.name);
-                    }}
-                    title={
-                      isCurrentUser
-                        ? "Click to change mood"
-                        : "Previous sprint mood"
-                    }
-                  >
-                    <AvatarFallback>
-                      <Mood />
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className={cn("text-sm")}>{participant.name}</span>
-                  {participant.name === scrumMaster && (
-                    <Badge size="xs">SM</Badge>
-                  )}
-                </div>
-              )}
+              <div className="flex flex-1 gap-2 items-center">
+                <ParticipantMood
+                  mood={mood}
+                  disabled={!isCurrentUser}
+                  onSelect={(newMood) => {
+                    handleMoodChange(participant.name, newMood);
+                  }}
+                />
+                <span className="text-sm">{participant.name}</span>
+                {isScrumMaster && (
+                  <Badge variant="secondary" title="Scrum Master" size="sm">
+                    SM
+                  </Badge>
+                )}
+              </div>
+
               {isScrumMaster && !isCurrentUser && !isActive && (
                 <Button
                   onClick={() => {
