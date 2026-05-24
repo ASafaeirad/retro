@@ -5,11 +5,13 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useState } from "react";
+import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
+import { ParticipantList } from "#components/ParticipantList.tsx";
+import { PhaseControls } from "#components/PhaseControls.tsx";
 import type { Id } from "#convex/models";
 import { clearSession } from "../../lib/participantAuth";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
-import { RetroSidebar } from "../../lib/retro/components/RetroSidebar";
 import { useRetroEffects } from "../../lib/retro/hooks/useRetroEffects";
 import { useRetroSession } from "../../lib/retro/hooks/useRetroSession";
 import { AddTicketsPhase } from "../../lib/retro/phases/AddTicketsPhase";
@@ -347,22 +349,16 @@ function RetroBoard() {
 
   return (
     <div className="min-h-screen py-8 px-4">
-      <div className="mx-auto max-w-7xl">
-        <RetroHeader
-          sprintNumber={session.sprintNumber}
-          phase={session.phase}
-          userName={name}
-        />
+      <div>
+        <RetroHeader sprintNumber={session.sprintNumber} />
 
-        <div className="flex gap-6">
-          <RetroSidebar
-            sessionId={sessionId as Id<"sessions">}
-            session={session}
+        <div className="w-64 shrink-0 space-y-4">
+          <ParticipantList
             participants={participants}
-            actionItems={actionItems}
+            scrumMaster={session.createdBy}
+            currentPresenter={selectedParticipantFilter || undefined}
             currentUserName={name}
-            isScrumMaster={isScrumMaster}
-            selectedParticipantFilter={selectedParticipantFilter || undefined}
+            sessionId={session._id}
             onSelectPresenter={
               session.phase === "PRESENT"
                 ? (name) => {
@@ -376,19 +372,38 @@ function RetroBoard() {
             onRemoveParticipant={
               isScrumMaster ? handleRemoveParticipant : undefined
             }
-            onPhaseChange={handlePhaseChange}
-            onCreateActionItem={
-              isScrumMaster
-                ? (text, assignee) =>
-                    createActionItem({
-                      text,
-                      assignee,
-                      createdInSprint: session.sprintNumber,
-                    })
-                : undefined
-            }
           />
 
+          {isScrumMaster && (
+            <PhaseControls
+              currentPhase={session.phase}
+              onPhaseChange={handlePhaseChange}
+            />
+          )}
+
+          {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
+            <ActionItemPanel
+              actionItems={
+                actionItems?.filter(
+                  (ai) => ai.createdInSprint === session.sprintNumber,
+                ) || []
+              }
+              participants={participants}
+              onCreateActionItem={
+                isScrumMaster
+                  ? (text, assignee) =>
+                      createActionItem({
+                        text,
+                        assignee,
+                        createdInSprint: session.sprintNumber,
+                      })
+                  : undefined
+              }
+            />
+          )}
+        </div>
+
+        <div className="flex gap-6">
           <div className="flex-1">{renderPhaseContent()}</div>
         </div>
       </div>
