@@ -1,6 +1,6 @@
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
-import ConvexProvider from "../integrations/convex/provider";
+import { ConvexProvider } from "#lib/convex/provider.tsx";
 
 import appCss from "../styles.css?url";
 
