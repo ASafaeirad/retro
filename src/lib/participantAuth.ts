@@ -8,16 +8,10 @@ interface StoredSession {
   mood?: Mood;
 }
 
-/**
- * Generate a unique session token using crypto.randomUUID()
- */
 export function generateToken(): string {
   return crypto.randomUUID();
 }
 
-/**
- * Get stored session credentials from localStorage for a specific session
- */
 export function getStoredSession(
   sessionId: Id<"sessions">,
 ): StoredSession | null {

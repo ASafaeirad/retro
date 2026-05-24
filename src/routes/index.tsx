@@ -2,9 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "#convex/api";
-import { Badge } from "#ui/badge.tsx";
+import type { Session } from "#models/session.ts";
+
 import { Button } from "#ui/button.tsx";
-import { Card, CardAction, CardContent, CardHeader } from "#ui/card.tsx";
+import { Card, CardAction, CardContent } from "#ui/card.tsx";
 import type { Id } from "../../convex/_generated/dataModel";
 import { Logo } from "../components/Logo.tsx";
 import { generateToken, storeSession } from "../lib/participantAuth";
@@ -102,28 +103,7 @@ function RetroSessionsPage() {
           </h2>
           <div className="space-y-3">
             {completedSessions.map((session) => (
-              <div
-                key={session._id}
-                className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4 opacity-75"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-[var(--sea-ink)]">
-                      Sprint {session.sprintNumber}
-                    </h3>
-                    <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-                      Completed • {session.participantCount} participants
-                    </p>
-                  </div>
-
-                  <Button
-                    onClick={() => navigate({ to: `/retro/${session._id}` })}
-                    variant="neutral"
-                  >
-                    View
-                  </Button>
-                </div>
-              </div>
+              <SessionCard key={session._id} session={session} />
             ))}
           </div>
         </div>
@@ -217,17 +197,7 @@ export const CreateSessionModal = ({
   );
 };
 
-export const SessionCard = ({
-  session,
-}: {
-  session: {
-    _id: string;
-    sprintNumber: number;
-    phase: string;
-    participantCount: number;
-    createdBy: string;
-  };
-}) => {
+export const SessionCard = ({ session }: { session: Session }) => {
   const joinSession = useMutation(api.retro.joinSession);
   const navigate = useNavigate();
 
@@ -253,6 +223,7 @@ export const SessionCard = ({
   };
 
   const isJoiningSession = joiningSessionId === session._id;
+  console.log(session.phase);
 
   return (
     <Card className="py-3" key={session._id}>
@@ -260,6 +231,7 @@ export const SessionCard = ({
         <h3 className="flex-1">Sprint {session.sprintNumber}</h3>
         <CardAction>
           <Button
+            variant={!session.isActive ? "neutral" : "default"}
             shadow="reverse"
             onClick={() => setJoiningSessionId(session._id)}
           >
