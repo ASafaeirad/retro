@@ -18,7 +18,7 @@ export const SessionList = ({
         <h2 className="text-xl uppercase">{title}</h2>
         {children}
       </div>
-      <hr className="border-muted" />
+      <hr className="border-border-muted" />
 
       <div className="gap-3 py-6 mx-6">
         {sessions.map((session) => (

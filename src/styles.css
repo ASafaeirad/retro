@@ -13,6 +13,7 @@
   --main-foreground: oklch(0% 0 0);
   --main: oklch(84.133% 0.13277 75.386);
   --border: oklch(0% 0 0);
+  --border-muted: oklch(0% 0 0 / 0.2);
   --danger: #FF4D50;
   --ring: oklch(0% 0 0);
   --overlay: oklch(0% 0 0 / 0.8);
@@ -33,6 +34,7 @@
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--fg-muted);
   --color-muted: var(--bg-muted);
+  --color-border-muted: var(--border-muted);
   --color-main-foreground: var(--main-foreground);
   --color-border: var(--border);
   --color-overlay: var(--overlay);
