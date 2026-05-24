@@ -15,7 +15,7 @@ export const SessionList = ({
   return (
     <div>
       <div className="flex justify-between mx-6 py-4">
-        <h2 className="text-xl">{title}</h2>
+        <h2 className="text-xl uppercase">{title}</h2>
         {children}
       </div>
       <hr className="border-muted" />

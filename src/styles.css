@@ -2,14 +2,16 @@
 @import "tw-animate-css";
 
 :root {
+  font-family: "Russo One", sans-serif;
   --background: oklch(95.31% 0.0496 169.04);
+  --body: oklch(80.946% 0.08182 98.576);
   --secondary-background: oklch(89.08% 0.13154 88.227);
-  --foreground: oklch(0% 0 0);
+  --foreground: oklch(19.872% 0.01774 37.303);
   --fg-muted: oklch(0% 0 0 / 0.6);
-  --bg-muted: oklch(0% 0 0 / 0.3);
+  --bg-muted: oklch(72.516% 0.00008 271.152);
   --card: oklch(100% 0 0);
   --main-foreground: oklch(0% 0 0);
-  --main: oklch(77.54% 0.1681 162.78);
+  --main: oklch(84.133% 0.13277 75.386);
   --border: oklch(0% 0 0);
   --danger: #FF4D50;
   --ring: oklch(0% 0 0);
@@ -50,11 +52,13 @@
   --shadow-shadow: var(--shadow);
   --font-weight-base: 500;
   --font-weight-heading: 700;
+  --font-sans: "Russo One", sans-serif;
 }
 
 @layer base {
   body {
-    @apply text-foreground font-base;
+    background-color: var(--body);
+    @apply text-foreground;
   }
 
   h1, h2, h3, h4, h5, h6{
