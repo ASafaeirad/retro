@@ -14,9 +14,11 @@ type ParticipantMoodProps = {
   mood: Mood;
   onSelect?: (mood: Mood) => void;
   disabled?: boolean;
+  isInactive?: boolean;
 };
 
 export const ParticipantMood = ({
+  isInactive,
   mood,
   onSelect,
   disabled,
@@ -30,7 +32,12 @@ export const ParticipantMood = ({
         disabled={disabled}
         title={disabled ? "Previous sprint mood" : "Click to change mood"}
       >
-        <Avatar className={cn({ "cursor-pointer": !disabled })}>
+        <Avatar
+          className={cn({
+            "cursor-pointer": !disabled,
+            "opacity-60": isInactive,
+          })}
+        >
           <AvatarFallback>
             <Mood />
           </AvatarFallback>

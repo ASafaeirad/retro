@@ -39,7 +39,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   );
   const updateHeartbeat = useMutation(api.retro.updateHeartbeat);
   const leaveSession = useMutation(api.retro.leaveSession);
-  const removeParticipant = useMutation(api.retro.removeParticipant);
 
   // Computed values
   const isScrumMaster = session?.createdBy === name;
@@ -75,7 +74,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     toggleActionItemComplete,
     updateHeartbeat,
     leaveSession,
-    removeParticipant,
     // Computed
     isScrumMaster,
     currentParticipant,

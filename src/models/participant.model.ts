@@ -8,3 +8,9 @@ export interface Participant {
   lastActiveAt: number;
   mood?: Mood;
 }
+
+const INACTIVE_THRESHOLD = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+export function isParticipantActive(lastActiveAt: number): boolean {
+  return Date.now() - lastActiveAt < INACTIVE_THRESHOLD;
+}

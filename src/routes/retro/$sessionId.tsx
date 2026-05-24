@@ -5,12 +5,9 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
-import { PhaseControls } from "#components/PhaseControls.tsx";
 import { ParticipantList } from "#components/participant-list/ParticipantList.tsx";
 import type { Id } from "#convex/models";
-import { clearSession } from "../../lib/participantAuth";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
 import { useRetroEffects } from "../../lib/retro/hooks/useRetroEffects";
 import { useRetroSession } from "../../lib/retro/hooks/useRetroSession";
@@ -47,34 +44,25 @@ function RetroBoard() {
     currentParticipant,
     myVotes,
     toggleActionItemComplete,
-    createActionItem,
     startTimer,
     pauseTimer,
     resumeTimer,
     extendTimer,
     completeDiscussion,
     updateHeartbeat,
-    leaveSession,
-    removeParticipant,
     updatePhase,
     toggleReady,
     addTicket,
     updateTicket,
     deleteTicket,
-    setCurrentPresenter,
     addTicketToGroup,
     castVote,
     removeVote,
     setVoteLimit,
     createGroup,
-    votes,
   } = useRetroSession(sessionId, name);
 
-  useRetroEffects({
-    sessionId: sessionId,
-    name,
-    updateHeartbeat: updateHeartbeat,
-  });
+  useRetroEffects({ sessionId, name, updateHeartbeat });
 
   const navigate = useNavigate();
 
@@ -129,42 +117,6 @@ function RetroBoard() {
     } catch (error) {
       console.error("Failed to delete ticket:", error);
       alert("Failed to delete ticket. Please try again.");
-    }
-  };
-
-  // Leave session
-  const handleLeaveSession = async () => {
-    if (!name) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to leave this session? You can rejoin later with the same name.",
-    );
-    if (!confirmed) return;
-
-    try {
-      await leaveSession({ sessionId, participantName: name });
-      clearSession(sessionId);
-      navigate({ to: "/" });
-    } catch (error) {
-      console.error("Failed to leave session:", error);
-      alert("Failed to leave session. Please try again.");
-    }
-  };
-
-  // Remove participant (scrum master only)
-  const handleRemoveParticipant = async (participantId: Id<"participants">) => {
-    if (!isScrumMaster || !name) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to remove this participant?",
-    );
-    if (!confirmed) return;
-
-    try {
-      await removeParticipant({ participantId, requestedBy: name });
-    } catch (error) {
-      console.error("Failed to remove participant:", error);
-      alert("Failed to remove participant. Please try again.");
     }
   };
 
@@ -348,15 +300,14 @@ function RetroBoard() {
   };
 
   return (
-    <div className="min-h-screen py-8 px-4">
-      <div>
+    <div className="min-h-screen py-6 px-4">
+      <div className="flex flex-col gap-4">
         <RetroHeader sprintNumber={session.sprintNumber} />
 
-        <div className="w-64 shrink-0 space-y-4">
+        <div className="w-64">
           <ParticipantList
             participants={participants}
             scrumMaster={session.createdBy}
-            currentPresenter={selectedParticipantFilter || undefined}
             currentUserName={name}
             sessionId={session._id}
             onSelectPresenter={
@@ -367,10 +318,6 @@ function RetroBoard() {
                     );
                   }
                 : undefined
-            }
-            onLeaveSession={handleLeaveSession}
-            onRemoveParticipant={
-              isScrumMaster ? handleRemoveParticipant : undefined
             }
           />
 
