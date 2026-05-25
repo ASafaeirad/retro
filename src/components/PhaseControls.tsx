@@ -1,14 +1,7 @@
 import { cn } from "#lib/cn";
+import type { Phase } from "#models/phase.model.ts";
 import { Button } from "#ui/button.tsx";
 import { Card, CardContent, CardHeader } from "./ui/card";
-
-type Phase =
-  | "REVIEW_ACTIONS"
-  | "ADD_TICKETS"
-  | "PRESENT"
-  | "GROUP"
-  | "VOTE"
-  | "DISCUSS";
 
 interface PhaseControlsProps {
   currentPhase: Phase;

@@ -4,4 +4,5 @@ export type Phase =
   | "PRESENT"
   | "GROUP"
   | "VOTE"
-  | "DISCUSS";
+  | "DISCUSS"
+  | "COMPLETED";
