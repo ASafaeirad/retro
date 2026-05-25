@@ -22,9 +22,11 @@ interface Props {
   sessionId: Id<"sessions">;
   onSelectPresenter?: (name: string) => void;
   className?: string;
+  title: string;
 }
 
 export function ParticipantList({
+  title,
   participants,
   scrumMaster,
   currentUserName,
@@ -84,7 +86,7 @@ export function ParticipantList({
   return (
     <Card className={cn("gap-2 py-2", className)}>
       <CardHeader>
-        <h3 className="text-sm font-semibold">Participants</h3>
+        <h3 className="text-sm font-semibold">{title}</h3>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
         <div className="border rounded">

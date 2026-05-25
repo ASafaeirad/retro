@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { useState } from "react";
 import { JoinForm } from "#components/JoinForm.tsx";
+import { PhaseControls } from "#components/PhaseControls.tsx";
 import { ParticipantList } from "#components/participant-list/ParticipantList.tsx";
 import type { Id } from "#convex/models";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
@@ -304,8 +305,9 @@ function RetroBoard() {
       <div className="flex flex-col gap-4">
         <RetroHeader sprintNumber={session.sprintNumber} />
 
-        <div className="w-64">
+        <div className="w-64 flex flex-col gap-4">
           <ParticipantList
+            title={`Sprint ${session.sprintNumber} Participants`}
             participants={participants}
             scrumMaster={session.createdBy}
             currentUserName={name}
@@ -321,14 +323,14 @@ function RetroBoard() {
             }
           />
 
-          {/* {isScrumMaster && (
+          {isScrumMaster && (
             <PhaseControls
               currentPhase={session.phase}
               onPhaseChange={handlePhaseChange}
             />
           )}
 
-          {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
+          {/* {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
             <ActionItemPanel
               actionItems={
                 actionItems?.filter(

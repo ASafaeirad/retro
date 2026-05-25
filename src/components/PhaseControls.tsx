@@ -1,5 +1,7 @@
+import { Check } from "lucide-react";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
+import { Card, CardContent, CardHeader } from "./ui/card";
 
 type Phase =
   | "REVIEW_ACTIONS"
@@ -7,8 +9,7 @@ type Phase =
   | "PRESENT"
   | "GROUP"
   | "VOTE"
-  | "DISCUSS"
-  | "COMPLETED";
+  | "DISCUSS";
 
 interface PhaseControlsProps {
   currentPhase: Phase;
@@ -40,11 +41,6 @@ const PHASE_FLOW: { phase: Phase; label: string; description: string }[] = [
     label: "Discuss",
     description: "Discuss voted items with timer",
   },
-  {
-    phase: "COMPLETED",
-    label: "Complete",
-    description: "Mark retro as completed",
-  },
 ];
 
 export function PhaseControls({
@@ -58,83 +54,96 @@ export function PhaseControls({
   const prevPhase = PHASE_FLOW[currentIndex - 1];
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4",
-        className,
-      )}
-    >
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-[var(--sea-ink)]">
-          Workflow Control
-        </h3>
-        <p className="text-xs text-[var(--sea-ink-soft)] mt-1">
-          Scrum Master Only
-        </p>
-      </div>
-
-      {/* Current phase */}
-      <div className="mb-4 rounded-md border-2 border-[var(--lagoon)] bg-[var(--chip-bg)] p-3">
-        <div className="text-xs text-[var(--kicker)] font-medium mb-1">
-          Current Phase
-        </div>
-        <div className="text-sm font-semibold text-[var(--sea-ink)]">
-          {PHASE_FLOW[currentIndex].label}
-        </div>
-        <div className="text-xs text-[var(--sea-ink-soft)] mt-1">
-          {PHASE_FLOW[currentIndex].description}
-        </div>
-      </div>
-
-      {/* Navigation buttons */}
-      <div className="flex gap-2">
-        {prevPhase && (
-          <Button
-            onClick={() => onPhaseChange(prevPhase.phase)}
-            variant="neutral"
-            size="sm"
-            className="flex-1"
-          >
-            ← Back
-          </Button>
-        )}
-
-        {nextPhase && (
-          <Button
-            onClick={() => onPhaseChange(nextPhase.phase)}
-            disabled={!canAdvance}
-            size="sm"
-            className="flex-1"
-          >
-            {nextPhase.label} →
-          </Button>
-        )}
-      </div>
-
-      {/* Phase progress */}
-      <div className="mt-4 space-y-1">
-        {PHASE_FLOW.map((phase, index) => (
-          <div
-            key={phase.phase}
-            className={cn(
-              "flex items-center gap-2 text-xs",
-              index === currentIndex && "font-medium text-[var(--lagoon)]",
-              index < currentIndex && "text-[var(--sea-ink-soft)] line-through",
-              index > currentIndex && "text-[var(--sea-ink-soft)]",
-            )}
-          >
-            <div
-              className={cn(
-                "h-1.5 w-1.5 rounded-full",
-                index === currentIndex && "bg-[var(--lagoon)]",
-                index < currentIndex && "bg-[var(--palm)]",
-                index > currentIndex && "bg-[var(--line)]",
-              )}
-            />
-            <span>{phase.label}</span>
+    <Card className={cn("gap-4", className)}>
+      <CardHeader>
+        <h3 className="text-sm">Workflow Control</h3>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4 rounded-md bg-muted/50 p-3">
+          <div className="text-xs font-medium text-muted-foreground mb-1">
+            Current Phase
           </div>
-        ))}
-      </div>
-    </div>
+          <div className="text-sm font-semibold">
+            {PHASE_FLOW[currentIndex].label}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {PHASE_FLOW[currentIndex].description}
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          {prevPhase && (
+            <Button
+              onClick={() => onPhaseChange(prevPhase.phase)}
+              variant="neutral"
+              size="sm"
+              className="flex-1"
+            >
+              ← Back
+            </Button>
+          )}
+
+          {nextPhase && (
+            <Button
+              onClick={() => onPhaseChange(nextPhase.phase)}
+              disabled={!canAdvance}
+              size="sm"
+              className="flex-1"
+            >
+              {nextPhase.label} →
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
+
+export const Stepper = ({ currentIndex }: { currentIndex: number }) => {
+  return (
+    <div className="flex border-border border-2 p-2 rounded bg-card items-center justify-between">
+      {PHASE_FLOW.map((phaseItem, index) => {
+        const isCompleted = index < currentIndex;
+        const isCurrent = index === currentIndex;
+        const isUpcoming = index > currentIndex;
+        const isLast = index === PHASE_FLOW.length - 1;
+
+        return (
+          <div key={phaseItem.phase} className="flex items-center flex-1">
+            <div className="flex flex-col items-center">
+              <div
+                className={cn(
+                  "rounded flex items-center justify-center font-semibold text-sm transition-all",
+                  isCompleted && "bg-primary text-primary-foreground",
+                  isCurrent && "bg-primary text-primary-foreground",
+                  isUpcoming && "text-foreground-muted",
+                )}
+              >
+                {isCompleted ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  <span className="px-2">{index + 1}</span>
+                )}
+                <span className="text-nowrap">{phaseItem.label}</span>
+              </div>
+            </div>
+
+            {!isLast && (
+              <svg
+                viewBox="0 0 14 21"
+                fill="currentColor"
+                className={cn("w-2 mx-2", {
+                  "text-foreground-muted": isUpcoming || isCurrent,
+                })}
+              >
+                <rect x="9" y="8" width="5" height="5" />
+                <rect x="4" y="3" width="5" height="5" />
+                <rect x="4" y="13" width="5" height="5" />
+              </svg>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
