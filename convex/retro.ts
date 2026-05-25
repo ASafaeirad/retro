@@ -1,4 +1,3 @@
-import type { Participant } from '#models/participant'
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 
@@ -52,7 +51,7 @@ export const getParticipants = query({
       .order('asc')
       .collect()
 
-    return participants as Participant[]
+    return participants;
   },
 })
 
@@ -139,11 +138,11 @@ export const getParticipantVotes = query({
 })
 
 export const getActionItems = query({
-  args: { sprintNumber: v.number() },
+  args: { sessionId: v.id('sessions') },
   handler: async (ctx, args) => {
     return await ctx.db
       .query('actionItems')
-      .withIndex('createdInSprint', (q) => q.eq('createdInSprint', args.sprintNumber))
+      .withIndex('createdInSession', (q) => q.eq('createdInSession', args.sessionId))
       .collect()
   },
 })
@@ -649,14 +648,14 @@ export const createActionItem = mutation({
   args: {
     text: v.string(),
     assignee: v.optional(v.string()),
-    createdInSprint: v.number(),
+    createdInSession: v.id('sessions'),
     relatedTicketId: v.optional(v.id('tickets')),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert('actionItems', {
       text: args.text,
       assignee: args.assignee,
-      createdInSprint: args.createdInSprint,
+      createdInSession: args.createdInSession,
       completed: false,
       relatedTicketId: args.relatedTicketId,
     })

@@ -85,9 +85,9 @@ export default defineSchema({
   actionItems: defineTable({
     text: v.string(),
     assignee: v.optional(v.string()), // participant name
-    createdInSprint: v.number(), // sprint number where created
+    createdInSession: v.id('sessions'),
     completed: v.boolean(),
     completedAt: v.optional(v.number()),
     relatedTicketId: v.optional(v.id('tickets')),
-  }).index('createdInSprint', ['createdInSprint']),
+  }).index('createdInSession', ['createdInSession']),
 })

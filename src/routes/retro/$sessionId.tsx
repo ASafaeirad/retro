@@ -5,10 +5,12 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useState } from "react";
+import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
 import { ParticipantList } from "#components/participant-list/ParticipantList.tsx";
 import type { Id } from "#convex/models";
+import type { Phase } from "#models/phase.model.ts";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
 import { useRetroEffects } from "../../lib/retro/hooks/useRetroEffects";
 import { useRetroSession } from "../../lib/retro/hooks/useRetroSession";
@@ -61,6 +63,7 @@ function RetroBoard() {
     removeVote,
     setVoteLimit,
     createGroup,
+    createActionItem,
   } = useRetroSession(sessionId, name);
 
   useRetroEffects({ sessionId, name, updateHeartbeat });
@@ -68,7 +71,7 @@ function RetroBoard() {
   const navigate = useNavigate();
 
   // Handle phase change
-  const handlePhaseChange = async (phase: any) => {
+  const handlePhaseChange = async (phase: Phase) => {
     if (!isScrumMaster || !name) return;
     await updatePhase({ sessionId, phase, requestedBy: name });
   };
@@ -299,11 +302,18 @@ function RetroBoard() {
         return null;
     }
   };
+  if (!session) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div>Session not found</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-6 px-4">
       <div className="flex flex-col gap-4">
-        <RetroHeader sprintNumber={session.sprintNumber} />
+        <RetroHeader />
 
         <div className="w-64 flex flex-col gap-4">
           <ParticipantList
@@ -330,26 +340,9 @@ function RetroBoard() {
             />
           )}
 
-          {/* {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
-            <ActionItemPanel
-              actionItems={
-                actionItems?.filter(
-                  (ai) => ai.createdInSprint === session.sprintNumber,
-                ) || []
-              }
-              participants={participants}
-              onCreateActionItem={
-                isScrumMaster
-                  ? (text, assignee) =>
-                      createActionItem({
-                        text,
-                        assignee,
-                        createdInSprint: session.sprintNumber,
-                      })
-                  : undefined
-              }
-            />
-          )} */}
+          {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
+            <ActionItemPanel sessionId={session._id} />
+          )}
         </div>
 
         {/* <div className="flex gap-6">

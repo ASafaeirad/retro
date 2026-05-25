@@ -14,7 +14,7 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   );
   const actionItems = useQuery(
     api.retro.getActionItems,
-    session ? { sprintNumber: session.sprintNumber - 1 } : "skip",
+    session ? { sessionId: session._id } : "skip",
   );
 
   const updatePhase = useMutation(api.retro.updatePhase);
