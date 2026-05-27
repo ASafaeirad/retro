@@ -8,37 +8,31 @@ import { Button } from "#ui/button.tsx";
 
 interface AddTicketsPhaseProps {
   tickets: any[];
-  currentParticipant?: any;
   currentUserName: string;
-  onToggleReady: () => void;
   onAddTicket: (
     text: string,
     category: "well" | "improve",
     imageUrl?: string,
-  ) => void;
+  ) => Promise<void>;
   onEditTicket: (
     ticketId: Id<"tickets">,
     text: string,
     imageUrl?: string,
-  ) => void;
+  ) => Promise<void>;
   onDeleteTicket: (ticketId: Id<"tickets">) => void;
 }
 
 export function AddTicketsPhase({
   tickets,
-  currentParticipant,
   currentUserName,
-  onToggleReady,
   onAddTicket,
   onEditTicket,
   onDeleteTicket,
 }: AddTicketsPhaseProps) {
   const [addingTicketCategory, setAddingTicketCategory] = useState<
-    "well" | "improve" | null
-  >(null);
-  const [editingTicketId, setEditingTicketId] = useState<Id<"tickets"> | null>(
-    null,
-  );
+    "well" | "improve"
+  >();
+  const [editingTicketId, setEditingTicketId] = useState<Id<"tickets">>();
 
   const wellTickets = tickets.filter((t) => t.category === "well");
   const improveTickets = tickets.filter((t) => t.category === "improve");
@@ -46,32 +40,17 @@ export function AddTicketsPhase({
   const handleAddTicket = async (text: string, imageUrl?: string) => {
     if (!addingTicketCategory) return;
     await onAddTicket(text, addingTicketCategory, imageUrl);
-    setAddingTicketCategory(null);
+    setAddingTicketCategory(undefined);
   };
 
   const handleEditTicket = async (text: string, imageUrl?: string) => {
     if (!editingTicketId) return;
     await onEditTicket(editingTicketId, text, imageUrl);
-    setEditingTicketId(null);
+    setEditingTicketId(undefined);
   };
 
   return (
     <div>
-      <div className="mb-6 rounded-lg border p-6">
-        <h2 className="mb-2 text-2xl font-bold">Add Tickets</h2>
-        <p>Add tickets to the board. Mark yourself as ready when done.</p>
-
-        {currentParticipant && (
-          <Button
-            onClick={onToggleReady}
-            shadow={currentParticipant.isReady ? "reverse" : "default"}
-            className="mt-4"
-          >
-            {currentParticipant.isReady ? "✓ Ready" : "Mark as Ready"}
-          </Button>
-        )}
-      </div>
-
       <div className="grid grid-cols-2 gap-6">
         <BoardColumn title="What Went Well" category="well">
           {wellTickets.map((ticket) =>
@@ -82,7 +61,7 @@ export function AddTicketsPhase({
                 initialImageUrl={ticket.imageUrl}
                 category="well"
                 onSubmit={handleEditTicket}
-                onCancel={() => setEditingTicketId(null)}
+                onCancel={() => setEditingTicketId(undefined)}
               />
             ) : (
               <TicketCard
@@ -100,7 +79,7 @@ export function AddTicketsPhase({
             <AddTicketForm
               category="well"
               onSubmit={handleAddTicket}
-              onCancel={() => setAddingTicketCategory(null)}
+              onCancel={() => setAddingTicketCategory(undefined)}
             />
           ) : (
             <Button
@@ -122,7 +101,7 @@ export function AddTicketsPhase({
                 initialImageUrl={ticket.imageUrl}
                 category="improve"
                 onSubmit={handleEditTicket}
-                onCancel={() => setEditingTicketId(null)}
+                onCancel={() => setEditingTicketId(undefined)}
               />
             ) : (
               <TicketCard
@@ -140,7 +119,7 @@ export function AddTicketsPhase({
             <AddTicketForm
               category="improve"
               onSubmit={handleAddTicket}
-              onCancel={() => setAddingTicketCategory(null)}
+              onCancel={() => setAddingTicketCategory(undefined)}
             />
           ) : (
             <Button

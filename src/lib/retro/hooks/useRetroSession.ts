@@ -34,9 +34,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   const extendTimer = useMutation(api.retro.extendTimer);
   const completeDiscussion = useMutation(api.retro.completeDiscussion);
   const createActionItem = useMutation(api.retro.createActionItem);
-  const toggleActionItemComplete = useMutation(
-    api.retro.toggleActionItemComplete,
-  );
   const updateHeartbeat = useMutation(api.retro.updateHeartbeat);
   const leaveSession = useMutation(api.retro.leaveSession);
 
@@ -71,7 +68,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     extendTimer,
     completeDiscussion,
     createActionItem,
-    toggleActionItemComplete,
     updateHeartbeat,
     leaveSession,
     // Computed

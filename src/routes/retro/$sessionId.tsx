@@ -18,6 +18,7 @@ import { AddTicketsPhase } from "../../lib/retro/phases/AddTicketsPhase";
 import { CompletedPhase } from "../../lib/retro/phases/CompletedPhase";
 import { DiscussPhase } from "../../lib/retro/phases/DiscussPhase";
 import { GroupPhase } from "../../lib/retro/phases/GroupPhase";
+import { ImReadyControl } from "../../lib/retro/phases/ImReadyControl";
 import { PresentPhase } from "../../lib/retro/phases/PresentPhase";
 import { ReviewActionsPhase } from "../../lib/retro/phases/ReviewActionsPhase";
 import { VotePhase } from "../../lib/retro/phases/VotePhase";
@@ -46,7 +47,6 @@ function RetroBoard() {
     isScrumMaster,
     currentParticipant,
     myVotes,
-    toggleActionItemComplete,
     startTimer,
     pauseTimer,
     resumeTimer,
@@ -208,24 +208,13 @@ function RetroBoard() {
   const renderPhaseContent = () => {
     switch (session.phase) {
       case "REVIEW_ACTIONS":
-        return (
-          <ReviewActionsPhase
-            sprintNumber={session.sprintNumber}
-            actionItems={actionItems}
-            participants={participants}
-            onToggleComplete={(id) =>
-              toggleActionItemComplete({ actionItemId: id })
-            }
-          />
-        );
+        return <ReviewActionsPhase sprintNumber={session.sprintNumber} />;
 
       case "ADD_TICKETS":
         return (
           <AddTicketsPhase
             tickets={tickets}
-            currentParticipant={currentParticipant}
             currentUserName={name}
-            onToggleReady={handleToggleReady}
             onAddTicket={handleAddTicket}
             onEditTicket={handleEditTicket}
             onDeleteTicket={handleDeleteTicket}
@@ -313,41 +302,48 @@ function RetroBoard() {
   return (
     <div className="min-h-screen py-6 px-4">
       <div className="flex flex-col gap-4">
-        <RetroHeader />
+        <RetroHeader phase={session.phase} />
 
-        <div className="w-64 flex flex-col gap-4">
-          <ParticipantList
-            title={`Sprint ${session.sprintNumber} Participants`}
-            participants={participants}
-            scrumMaster={session.createdBy}
-            currentUserName={name}
-            sessionId={session._id}
-            onSelectPresenter={
-              session.phase === "PRESENT"
-                ? (name) => {
-                    setSelectedParticipantFilter((prev) =>
-                      prev === name ? undefined : name,
-                    );
-                  }
-                : undefined
-            }
-          />
-
-          {isScrumMaster && (
-            <PhaseControls
-              currentPhase={session.phase}
-              onPhaseChange={handlePhaseChange}
+        <div className="flex gap-6">
+          <div className="w-64 flex flex-col gap-4">
+            <ParticipantList
+              title={`Sprint ${session.sprintNumber}`}
+              participants={participants}
+              scrumMaster={session.createdBy}
+              currentUserName={name}
+              sessionId={session._id}
+              onSelectPresenter={
+                session.phase === "PRESENT"
+                  ? (name) => {
+                      setSelectedParticipantFilter((prev) =>
+                        prev === name ? undefined : name,
+                      );
+                    }
+                  : undefined
+              }
             />
-          )}
 
-          {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
-            <ActionItemPanel sessionId={session._id} />
-          )}
-        </div>
+            {session.phase === "ADD_TICKETS" && (
+              <ImReadyControl
+                onToggleReady={handleToggleReady}
+                isReady={currentParticipant?.isReady || false}
+              />
+            )}
 
-        {/* <div className="flex gap-6">
+            {isScrumMaster ? (
+              <PhaseControls
+                currentPhase={session.phase}
+                onPhaseChange={handlePhaseChange}
+              />
+            ) : null}
+
+            {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
+              <ActionItemPanel sessionId={session._id} />
+            )}
+          </div>
+
           <div className="flex-1">{renderPhaseContent()}</div>
-        </div> */}
+        </div>
       </div>
     </div>
   );
