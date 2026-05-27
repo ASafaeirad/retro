@@ -27,17 +27,19 @@ const PHASE_FLOW: { phase: Phase; label: string; description: string }[] = [
   },
 ];
 
-export function RetroHeader() {
+export function RetroHeader({ phase }: { phase: Phase }) {
+  const currentIndex = PHASE_FLOW.findIndex((p) => p.phase === phase);
+
   return (
     <header className="flex gap-4 items-center">
-      <Stepper currentIndex={0} />
+      <Stepper currentIndex={currentIndex} />
     </header>
   );
 }
 
 const Stepper = ({ currentIndex }: { currentIndex: number }) => {
   return (
-    <div className="flex border-border border-2 p-2 rounded bg-card items-center justify-between">
+    <div className="flex border-border border-2 p-2 rounded bg-card items-center justify-start w-full">
       {PHASE_FLOW.map((phaseItem, index) => {
         const isCompleted = index < currentIndex;
         const isCurrent = index === currentIndex;
@@ -45,12 +47,12 @@ const Stepper = ({ currentIndex }: { currentIndex: number }) => {
         const isLast = index === PHASE_FLOW.length - 1;
 
         return (
-          <div key={phaseItem.phase} className="flex items-center flex-1">
+          <div key={phaseItem.phase} className="flex items-center flex-0">
             <div className="flex flex-col items-center">
               <div
                 className={cn(
                   "rounded flex items-center justify-center font-semibold text-sm transition-all",
-                  isCompleted && "bg-primary text-primary-foreground",
+                  isCompleted && "bg-primary text-emerald-800",
                   isCurrent && "bg-primary text-primary-foreground",
                   isUpcoming && "text-foreground-muted",
                 )}
