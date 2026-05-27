@@ -1,7 +1,10 @@
-import { Edit, Trash } from "lucide-react";
+import { ThumbsUp, Trash } from "lucide-react";
+import { useState } from "react";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
+import { Card, CardContent, CardFooter } from "./ui/card";
+import { Textarea } from "./ui/textarea";
 
 interface TicketCardProps {
   id: Id<"tickets">;
@@ -42,10 +45,12 @@ export function TicketCard({
   const isAuthor = currentUserName && currentUserName === author;
 
   return (
-    <div
+    <Card
+      variant="main"
       onClick={onClick}
+      space="compact"
       className={cn(
-        "relative rounded-lg border-2 p-4 shadow-sm transition-all",
+        "relative py-2 px-1",
         {
           "ring-2": isHighlighted,
           "opacity-40": isDimmed,
@@ -54,43 +59,24 @@ export function TicketCard({
         className,
       )}
     >
-      {/* Vote count badge */}
-      {voteLimit > 0 && (
-        <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--lagoon)] text-sm font-bold text-white shadow-md">
-          {voteLimit}
-        </div>
-      )}
+      <CardContent className="px-1">
+        {isAuthor && onDelete && (
+          <div className="absolute right-2 top-2 flex gap-1">
+            {onDelete && (
+              <Button
+                onClick={onDelete}
+                size="icon"
+                variant="danger"
+                shadow="reverse"
+                title="Delete ticket"
+              >
+                <Trash />
+              </Button>
+            )}
+          </div>
+        )}
 
-      {/* Edit/Delete buttons for author */}
-      {isAuthor && (onEdit || onDelete) && (
-        <div className="absolute right-2 top-2 flex gap-1">
-          {onEdit && (
-            <Button
-              onClick={onEdit}
-              size="icon"
-              variant="neutral"
-              shadow="reverse"
-              title="Edit ticket"
-            >
-              <Edit />
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              onClick={onDelete}
-              size="icon"
-              variant="danger"
-              shadow="reverse"
-              title="Delete ticket"
-            >
-              <Trash />
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Image if provided */}
-      {imageUrl && (
+        {/* {imageUrl && (
         <div className="mb-3 overflow-hidden rounded-md">
           <img
             src={imageUrl}
@@ -101,29 +87,31 @@ export function TicketCard({
             }}
           />
         </div>
-      )}
+      )} */}
 
-      {/* Ticket text */}
-      <p className="mb-3 text-sm leading-relaxed">{text}</p>
-
-      {/* Author and actions */}
-      <div className="flex items-center justify-between">
+        <Textarea
+          value={text}
+          // onChange={(e) => setNewText(e.target.value)}
+          placeholder="Action item description..."
+          rows={2}
+          autoFocus
+        />
+      </CardContent>
+      <CardFooter className="absolute bottom-1 left-1 flex items-center justify-between px-1">
         <span className="text-xs font-medium">{author}</span>
 
         {onVote && (
-          <Button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onVote();
-            }}
-            size="sm"
-            shadow={hasVoted ? "reverse" : "default"}
-          >
-            {hasVoted ? "Withdraw" : "Vote"}
-          </Button>
+          <div>
+            <Button
+              onClick={onVote}
+              size="xs"
+              shadow={hasVoted ? "reverse" : "default"}
+            >
+              <ThumbsUp />
+            </Button>
+          </div>
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

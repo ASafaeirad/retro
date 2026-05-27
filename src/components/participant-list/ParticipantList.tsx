@@ -134,7 +134,7 @@ export function ParticipantList({
                     {participant.name}
                   </span>
                   {participant.name === scrumMaster && (
-                    <Badge variant="secondary" title="Scrum Master" size="sm">
+                    <Badge variant="secondary" title="Scrum Master" size="xs">
                       SM
                     </Badge>
                   )}
