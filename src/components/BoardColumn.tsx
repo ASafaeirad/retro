@@ -1,5 +1,5 @@
-import { cn } from "#lib/cn";
 import type { ReactNode } from "react";
+import { Card, CardContent, CardHeader } from "./ui/card";
 
 interface BoardColumnProps {
   title: string;
@@ -8,27 +8,17 @@ interface BoardColumnProps {
   className?: string;
 }
 
-export function BoardColumn({
-  title,
-  category,
-  children,
-  className,
-}: BoardColumnProps) {
+export function BoardColumn({ title, category, children }: BoardColumnProps) {
   return (
-    <div className={cn("flex flex-col", className)}>
-      <div
-        className={cn(
-          "mb-4 rounded-lg border-2 px-4 py-3",
-          category === "well" &&
-            "border-[var(--lagoon-deep)] bg-gradient-to-br from-[var(--hero-a)] to-transparent",
-          category === "improve" &&
-            "border-[var(--palm)] bg-gradient-to-br from-[var(--hero-b)] to-transparent",
-        )}
-      >
-        <h2 className="text-lg font-semibold text-[var(--sea-ink)]">{title}</h2>
-      </div>
+    <Card
+      space="compact"
+      className={category === "well" ? "bg-column-1" : "bg-column-2"}
+    >
+      <CardHeader>
+        <h2>{title}</h2>
+      </CardHeader>
 
-      <div className="flex-1 space-y-3">{children}</div>
-    </div>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 }

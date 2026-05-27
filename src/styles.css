@@ -18,6 +18,8 @@
   --ring: oklch(0% 0 0);
   --overlay: oklch(0% 0 0 / 0.8);
   --shadow: 4px 4px 0px 0px var(--border);
+  --column-1: oklch(79.508% 0.15515 166.035);
+  --column-2: oklch(67.963% 0.16607 25.452);
   --chart-1: #00D696;
   --chart-2: #7A83FF;
   --chart-3: #FACC00;
@@ -45,6 +47,8 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-card: var(--card);
+  --color-column-1: var(--column-1);
+  --color-column-2: var(--column-2);
 
   --spacing-boxShadowX: 4px;
   --spacing-boxShadowY: 4px;
