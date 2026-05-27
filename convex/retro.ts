@@ -35,6 +35,16 @@ export const listSessions = query({
   },
 })
 
+export const getSessionBySprintId = query({
+  args: { sprintNumber: v.number() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('sessions')
+      .withIndex('sprintNumber', (q) => q.eq('sprintNumber', args.sprintNumber))
+      .first()
+  },
+})
+
 export const getSession = query({
   args: { sessionId: v.id('sessions') },
   handler: async (ctx, args) => {
