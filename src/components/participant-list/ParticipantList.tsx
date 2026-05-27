@@ -84,11 +84,11 @@ export function ParticipantList({
   };
 
   return (
-    <Card className={cn("gap-2 py-2", className)}>
+    <Card space="compact">
       <CardHeader>
-        <h3 className="text-sm font-semibold">{title}</h3>
+        <h3>{title}</h3>
       </CardHeader>
-      <CardContent className="flex flex-col gap-2">
+      <CardContent>
         <div className="border rounded">
           {participants.map((participant) => {
             const isActive = isParticipantActive(participant.lastActiveAt);

@@ -19,11 +19,13 @@ interface ActionItem {
 interface ActionItemPanelProps {
   className?: string;
   sessionId: Id<"sessions">;
+  children?: React.ReactNode;
 }
 
 export function ActionItemPanel({
   sessionId,
   className,
+  children,
 }: ActionItemPanelProps) {
   const actionItems = useQuery(api.retro.getActionItems, { sessionId });
   const createActionItem = useMutation(api.retro.createActionItem);
@@ -49,9 +51,10 @@ export function ActionItemPanel({
         <h3 className="text-sm font-semibold">
           Action Items ({actionItems?.length ?? 0})
         </h3>
+        {children}
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="gap-4">
         {actionItems?.map((item) => (
           <Card key={item._id} variant="main" className={cn("p-3 h-40")}>
             <p className={cn("text-sm")}>{item.text}</p>
@@ -66,7 +69,7 @@ export function ActionItemPanel({
 
         {isAdding && (
           <Card variant="main">
-            <CardContent className="flex flex-col gap-3">
+            <CardContent className="gap-3">
               <Textarea
                 value={newText}
                 onChange={(e) => setNewText(e.target.value)}

@@ -1,7 +1,6 @@
-import { cn } from "#lib/cn";
 import type { Phase } from "#models/phase.model.ts";
 import { Button } from "#ui/button.tsx";
-import { Card, CardContent, CardHeader } from "./ui/card";
+import { Card, CardBlock, CardContent, CardHeader } from "./ui/card";
 
 interface PhaseControlsProps {
   currentPhase: Phase;
@@ -39,29 +38,28 @@ export function PhaseControls({
   currentPhase,
   onPhaseChange,
   canAdvance = true,
-  className,
 }: PhaseControlsProps) {
   const currentIndex = PHASE_FLOW.findIndex((p) => p.phase === currentPhase);
   const nextPhase = PHASE_FLOW[currentIndex + 1];
   const prevPhase = PHASE_FLOW[currentIndex - 1];
 
   return (
-    <Card className={cn("gap-2 py-2 pb-4", className)}>
+    <Card space="compact">
       <CardHeader>
-        <h3 className="text-sm">Workflow Control</h3>
+        <h3>Workflow Control</h3>
       </CardHeader>
-      <CardContent className="flex flex-col gap-2">
-        <div className="rounded-md bg-muted/50 p-3">
-          <div className="text-xs font-medium text-muted-foreground mb-1">
+      <CardContent>
+        <CardBlock>
+          <div className="text-xs font-medium text-muted-foreground">
             Current Phase
           </div>
           <div className="text-sm font-semibold">
             {PHASE_FLOW[currentIndex].label}
           </div>
-          <div className="text-xs text-muted-foreground mt-1">
+          <div className="text-xs text-muted-foreground">
             {PHASE_FLOW[currentIndex].description}
           </div>
-        </div>
+        </CardBlock>
 
         <div className="flex gap-2">
           {prevPhase && (

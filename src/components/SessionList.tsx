@@ -48,7 +48,7 @@ export const SessionCard = ({ session }: { session: Session }) => {
 
   return (
     <Card className="py-3" key={session._id}>
-      <CardContent className="flex justify-between items-center">
+      <CardContent className="justify-between items-center">
         <h3 className="flex-1">Sprint {session.sprintNumber}</h3>
         <CardAction>
           <Button
