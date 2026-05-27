@@ -300,50 +300,48 @@ function RetroBoard() {
   }
 
   return (
-    <div className="min-h-screen py-6 px-4">
-      <div className="flex flex-col gap-4">
-        <RetroHeader phase={session.phase} />
+    <div className="min-h-screen py-6 px-4 flex flex-col gap-4">
+      <RetroHeader phase={session.phase} />
 
-        <div className="flex gap-6">
-          <div className="w-64 flex flex-col gap-4">
-            <ParticipantList
-              title={`Sprint ${session.sprintNumber}`}
-              participants={participants}
-              scrumMaster={session.createdBy}
-              currentUserName={name}
-              sessionId={session._id}
-              onSelectPresenter={
-                session.phase === "PRESENT"
-                  ? (name) => {
-                      setSelectedParticipantFilter((prev) =>
-                        prev === name ? undefined : name,
-                      );
-                    }
-                  : undefined
-              }
+      <div className="flex flex-1 gap-6">
+        <div className="w-64 flex flex-col gap-4">
+          <ParticipantList
+            title={`Sprint ${session.sprintNumber}`}
+            participants={participants}
+            scrumMaster={session.createdBy}
+            currentUserName={name}
+            sessionId={session._id}
+            onSelectPresenter={
+              session.phase === "PRESENT"
+                ? (name) => {
+                    setSelectedParticipantFilter((prev) =>
+                      prev === name ? undefined : name,
+                    );
+                  }
+                : undefined
+            }
+          />
+
+          {session.phase === "ADD_TICKETS" && (
+            <ImReadyControl
+              onToggleReady={handleToggleReady}
+              isReady={currentParticipant?.isReady || false}
             />
+          )}
 
-            {session.phase === "ADD_TICKETS" && (
-              <ImReadyControl
-                onToggleReady={handleToggleReady}
-                isReady={currentParticipant?.isReady || false}
-              />
-            )}
+          {isScrumMaster ? (
+            <PhaseControls
+              currentPhase={session.phase}
+              onPhaseChange={handlePhaseChange}
+            />
+          ) : null}
 
-            {isScrumMaster ? (
-              <PhaseControls
-                currentPhase={session.phase}
-                onPhaseChange={handlePhaseChange}
-              />
-            ) : null}
-
-            {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
-              <ActionItemPanel sessionId={session._id} />
-            )}
-          </div>
-
-          <div className="flex-1">{renderPhaseContent()}</div>
+          {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
+            <ActionItemPanel sessionId={session._id} />
+          )}
         </div>
+
+        <div className="flex-1">{renderPhaseContent()}</div>
       </div>
     </div>
   );
