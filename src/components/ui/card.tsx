@@ -2,9 +2,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "#lib/cn";
 
 const cardVariants = cva(
-  "rounded-base flex flex-col shadow-shadow border-2 gap-6 py-6 border-border text-foreground font-base",
+  "rounded-base flex flex-col shadow-shadow border-2 border-border text-foreground font-base",
   {
     variants: {
+      space: {
+        default: "gap-6 py-6 ",
+        compact: "gap-2 py-4",
+      },
       variant: {
         default: "bg-card",
         main: "bg-secondary-background",
@@ -12,6 +16,7 @@ const cardVariants = cva(
     },
     defaultVariants: {
       variant: "default",
+      space: "default",
     },
   },
 );
@@ -19,12 +24,13 @@ const cardVariants = cva(
 function Card({
   className,
   variant,
+  space,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
-      className={cn(cardVariants({ variant }), className)}
+      className={cn(cardVariants({ variant, space }), className)}
       {...props}
     />
   );
@@ -35,7 +41,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "@container/card-header flex flex-col gap-1.5 px-6",
+        "@container/card-header flex flex-col gap-1 px-6",
         className,
       )}
       {...props}
@@ -80,7 +86,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-6", className)}
+      className={cn("px-6 flex flex-col gap-2", className)}
       {...props}
     />
   );
@@ -91,6 +97,21 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+      {...props}
+    />
+  );
+}
+
+export function CardBlock({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "rounded bg-muted/50 px-3 py-2 flex flex-col gap-1",
+        className,
+      )}
       {...props}
     />
   );
