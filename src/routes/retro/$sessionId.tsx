@@ -301,8 +301,6 @@ function RetroBoard() {
 
   return (
     <div className="min-h-screen py-6 px-4 flex flex-col gap-4">
-      <RetroHeader phase={session.phase} />
-
       <div className="flex flex-1 gap-6">
         <div className="w-64 flex flex-col gap-4">
           <ParticipantList
@@ -341,7 +339,10 @@ function RetroBoard() {
           )}
         </div>
 
-        <div className="flex-1">{renderPhaseContent()}</div>
+        <div className="flex-1 gap-4 flex flex-col">
+          <RetroHeader phase={session.phase} />
+          {renderPhaseContent()}
+        </div>
       </div>
     </div>
   );

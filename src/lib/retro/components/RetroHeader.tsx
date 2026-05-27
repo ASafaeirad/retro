@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Card } from "#components/ui/card.tsx";
 import { cn } from "#lib/cn";
 import type { Phase } from "#models/phase.model.ts";
 
@@ -39,7 +39,7 @@ export function RetroHeader({ phase }: { phase: Phase }) {
 
 const Stepper = ({ currentIndex }: { currentIndex: number }) => {
   return (
-    <div className="flex border-border border-2 p-2 rounded bg-card items-center justify-start w-full">
+    <Card className="flex flex-row p-2 gap-0 items-center justify-start w-full">
       {PHASE_FLOW.map((phaseItem, index) => {
         const isCompleted = index < currentIndex;
         const isCurrent = index === currentIndex;
@@ -49,40 +49,52 @@ const Stepper = ({ currentIndex }: { currentIndex: number }) => {
         return (
           <div key={phaseItem.phase} className="flex items-center flex-0">
             <div className="flex flex-col items-center">
-              <div
+              <h3
                 className={cn(
-                  "rounded flex items-center justify-center font-semibold text-sm transition-all",
+                  "rounded flex items-center gap-2 justify-center py-1 px-2 text-sm transition-all text-nowrap",
                   isCompleted && "bg-primary text-emerald-800",
                   isCurrent && "bg-primary text-primary-foreground",
                   isUpcoming && "text-foreground-muted",
                 )}
               >
-                {isCompleted ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <span className="px-2">{index + 1}</span>
-                )}
-                <span className="text-nowrap">{phaseItem.label}</span>
-              </div>
+                {isCompleted ? <Check /> : <span>{index + 1}</span>}
+                {phaseItem.label}
+              </h3>
             </div>
 
             {!isLast && (
-              <svg
-                viewBox="0 0 14 21"
-                fill="currentColor"
+              <Arrow
                 className={cn("w-2 mx-2", {
                   "text-foreground-muted": isUpcoming || isCurrent,
                 })}
-              >
-                <title>{`Transition to ${PHASE_FLOW[index + 1].label}`}</title>
-                <rect x="9" y="8" width="5" height="5" />
-                <rect x="4" y="3" width="5" height="5" />
-                <rect x="4" y="13" width="5" height="5" />
-              </svg>
+              />
             )}
           </div>
         );
       })}
-    </div>
+    </Card>
   );
 };
+
+function Check(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="12" viewBox="0 0 24 21" fill="currentColor" {...props}>
+      <title>Check</title>
+      <rect x="12" y="13" width="5" height="5" transform="rotate(90 12 13)" />
+      <rect x="17" y="8" width="5" height="5" transform="rotate(90 17 8)" />
+      <rect x="22" y="3" width="5" height="5" transform="rotate(90 22 3)" />
+      <rect x="7" y="8" width="5" height="5" transform="rotate(90 7 8)" />
+    </svg>
+  );
+}
+
+function Arrow(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 14 21" fill="currentColor" {...props}>
+      <title>Separator</title>
+      <rect x="9" y="8" width="5" height="5" />
+      <rect x="4" y="3" width="5" height="5" />
+      <rect x="4" y="13" width="5" height="5" />
+    </svg>
+  );
+}

@@ -40,7 +40,7 @@ function RootDocument({ children }: React.PropsWithChildren) {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400..900&display=swap"
           rel="stylesheet"
         />
       </head>

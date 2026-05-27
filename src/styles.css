@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 
 :root {
-  font-family: "Russo One", sans-serif;
   --background: oklch(95.31% 0.0496 169.04);
   --body: oklch(84.324% 0.07519 86.727);
   --secondary-background: oklch(89.08% 0.13154 88.227);
@@ -18,8 +17,8 @@
   --ring: oklch(0% 0 0);
   --overlay: oklch(0% 0 0 / 0.8);
   --shadow: 4px 4px 0px 0px var(--border);
-  --column-1: oklch(79.508% 0.15515 166.035);
-  --column-2: oklch(67.963% 0.16607 25.452);
+  --column-1: oklch(74.727% 0.09298 136.439);
+  --column-2: oklch(74.781% 0.12649 49.714);
   --chart-1: #00D696;
   --chart-2: #7A83FF;
   --chart-3: #FACC00;
@@ -56,9 +55,9 @@
   --spacing-reverseBoxShadowY: -4px;
   --radius-base: 5px;
   --shadow-shadow: var(--shadow);
-  --font-weight-base: 500;
+  --font-weight-base: 600;
   --font-weight-heading: 700;
-  --font-sans: "Russo One", sans-serif;
+  --font-sans: "Commissioner", "Roboto Condensed", sans-serif;
   --text-xs: 0.6rem;
 }
 
