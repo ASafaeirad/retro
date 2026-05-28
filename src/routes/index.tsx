@@ -95,7 +95,7 @@ function RetroSessionsPage() {
           <hr className="border-t-0 border-b-2" />
         </div>
       )}
-      <div className="text-center text-foreground-muted py-4">
+      <div className="text-center font-bold text-foreground-muted py-4">
         Made with Keyboard (Mostly)
       </div>
     </div>

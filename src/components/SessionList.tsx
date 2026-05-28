@@ -3,15 +3,14 @@ import type { Session } from "#models/session.ts";
 
 import { Button } from "#ui/button.tsx";
 import { Card, CardAction, CardContent } from "#ui/card.tsx";
-export const SessionList = ({
-  sessions,
-  children,
-  title,
-}: {
+
+type Props = {
   sessions: Session[];
   children?: React.ReactNode;
   title: string;
-}) => {
+};
+
+export const SessionList = ({ sessions, children, title }: Props) => {
   if (sessions.length === 0) {
     return null;
   }
@@ -24,7 +23,7 @@ export const SessionList = ({
       </div>
       <hr className="border-border-muted" />
 
-      <div className="gap-3 py-6 mx-6">
+      <div className="flex flex-col gap-3 py-6 mx-6">
         {sessions.map((session) => (
           <SessionCard key={session._id} session={session} />
         ))}
@@ -48,7 +47,7 @@ export const SessionCard = ({ session }: { session: Session }) => {
 
   return (
     <Card className="py-3" key={session._id}>
-      <CardContent className="justify-between items-center">
+      <CardContent className="justify-between flex-row items-center">
         <h3 className="flex-1">Sprint {session.sprintNumber}</h3>
         <CardAction>
           <Button
