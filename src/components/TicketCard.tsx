@@ -1,14 +1,12 @@
 import { debounce } from "@fullstacksjs/toolbox";
 import { ThumbsUp, Trash } from "lucide-react";
 import { useState } from "react";
-import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Textarea } from "./ui/textarea";
 
 interface TicketCardProps {
-  id: Id<"tickets">;
   text: string;
   author: string;
   imageUrl?: string;
@@ -63,17 +61,15 @@ export function TicketCard({
       <CardContent className="px-1">
         {isAuthor && onDelete && (
           <div className="absolute right-2 top-2 flex gap-1">
-            {onDelete && (
-              <Button
-                onClick={onDelete}
-                size="icon"
-                variant="danger"
-                shadow="reverse"
-                title="Delete ticket"
-              >
-                <Trash />
-              </Button>
-            )}
+            <Button
+              onClick={onDelete}
+              size="icon"
+              variant="danger"
+              shadow="reverse"
+              title="Delete ticket"
+            >
+              <Trash />
+            </Button>
           </div>
         )}
 
@@ -102,7 +98,7 @@ export function TicketCard({
         />
       </CardContent>
       <CardFooter className="absolute bottom-1 left-1 flex items-center justify-between px-1">
-        <span className="text-xs font-medium">{author}</span>
+        <span className="text-xs text-foreground-muted">{author}</span>
 
         {onVote && (
           <div>

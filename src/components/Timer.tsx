@@ -127,7 +127,7 @@ export function Timer({
           +1 min
         </Button>
 
-        <Button onClick={onComplete} variant="reverse" size="sm">
+        <Button onClick={onComplete} shadow="reverse" size="sm">
           Done
         </Button>
       </div>

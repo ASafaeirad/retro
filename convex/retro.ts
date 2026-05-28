@@ -757,3 +757,10 @@ export const removeParticipant = mutation({
     await ctx.db.delete(args.participantId)
   },
 })
+
+export const deleteActionItem = mutation({
+  args: { actionItemId: v.id('actionItems') },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.actionItemId)
+  },
+})

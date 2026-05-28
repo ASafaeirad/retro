@@ -1,48 +1,35 @@
 import { useMutation, useQuery } from "convex/react";
-import { Check } from "lucide-react";
 import { useState } from "react";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
+import { TicketCard } from "./TicketCard";
 import { Card, CardContent, CardHeader } from "./ui/card";
-import { Textarea } from "./ui/textarea";
 
-interface ActionItem {
-  _id: Id<"actionItems">;
-  text: string;
-  assignee?: string;
-  completed: boolean;
-  completedAt?: number;
-}
-
-interface ActionItemPanelProps {
+interface Props {
   className?: string;
   sessionId: Id<"sessions">;
   children?: React.ReactNode;
+  currentUser: string;
 }
 
 export function ActionItemPanel({
+  currentUser,
   sessionId,
   className,
   children,
-}: ActionItemPanelProps) {
+}: Props) {
   const actionItems = useQuery(api.retro.getActionItems, { sessionId });
   const createActionItem = useMutation(api.retro.createActionItem);
-
-  const [isAdding, setIsAdding] = useState(false);
-  const [newText, setNewText] = useState("");
+  const deleteActionItem = useMutation(api.retro.deleteActionItem);
 
   const handleCreate = () => {
-    if (newText.trim()) {
-      createActionItem({
-        text: newText.trim(),
-        assignee: undefined,
-        createdInSession: sessionId,
-      });
-      setNewText("");
-      setIsAdding(false);
-    }
+    createActionItem({
+      text: "",
+      assignee: undefined,
+      createdInSession: sessionId,
+    });
   };
 
   return (
@@ -55,56 +42,27 @@ export function ActionItemPanel({
       </CardHeader>
 
       <CardContent className="gap-4">
+        <Button onClick={() => handleCreate()} full size="sm">
+          + Add
+        </Button>
+
         {actionItems?.map((item) => (
-          <Card key={item._id} variant="main" className={cn("p-3 h-40")}>
-            <p className={cn("text-sm")}>{item.text}</p>
-          </Card>
+          <TicketCard
+            key={item._id}
+            text={item.text}
+            author={currentUser}
+            currentUserName={currentUser}
+            voteLimit={0}
+            isDimmed={item.completed}
+            onDelete={() => deleteActionItem({ actionItemId: item._id })}
+            onClick={() => {}}
+          />
         ))}
 
-        {actionItems?.length === 0 && !isAdding && (
+        {actionItems?.length === 0 && (
           <p className="text-sm text-center text-foreground-muted py-4">
             No action items yet
           </p>
-        )}
-
-        {isAdding && (
-          <Card variant="main">
-            <CardContent className="gap-3">
-              <Textarea
-                value={newText}
-                onChange={(e) => setNewText(e.target.value)}
-                placeholder="Action item description..."
-                rows={2}
-                autoFocus
-              />
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleCreate}
-                  disabled={!newText.trim()}
-                  size="sm"
-                  className="flex-1"
-                >
-                  Create
-                </Button>
-                <Button
-                  onClick={() => {
-                    setIsAdding(false);
-                    setNewText("");
-                  }}
-                  variant="neutral"
-                  size="sm"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        {!isAdding && (
-          <Button onClick={() => setIsAdding(true)} full size="sm">
-            + Add
-          </Button>
         )}
       </CardContent>
     </Card>

@@ -100,7 +100,7 @@ function RetroBoard() {
   ) => {
     if (!name) return;
     try {
-      await updateTicket({ ticketId, text, imageUrl, author: name });
+      return updateTicket({ ticketId, text, imageUrl, author: name });
     } catch (error) {
       console.error("Failed to edit ticket:", error);
       alert("Failed to edit ticket. Please try again.");
@@ -208,7 +208,12 @@ function RetroBoard() {
   const renderPhaseContent = () => {
     switch (session.phase) {
       case "REVIEW_ACTIONS":
-        return <ReviewActionsPhase sprintNumber={session.sprintNumber} />;
+        return (
+          <ReviewActionsPhase
+            currentUser={name}
+            sprintNumber={session.sprintNumber}
+          />
+        );
 
       case "ADD_TICKETS":
         return (
@@ -335,7 +340,7 @@ function RetroBoard() {
           ) : null}
 
           {(session.phase === "DISCUSS" || session.phase === "COMPLETED") && (
-            <ActionItemPanel sessionId={session._id} />
+            <ActionItemPanel currentUser={name} sessionId={session._id} />
           )}
         </div>
 

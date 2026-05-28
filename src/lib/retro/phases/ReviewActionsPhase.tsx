@@ -4,9 +4,13 @@ import { api } from "#convex/api";
 
 interface ReviewActionsPhaseProps {
   sprintNumber: number;
+  currentUser: string;
 }
 
-export function ReviewActionsPhase({ sprintNumber }: ReviewActionsPhaseProps) {
+export function ReviewActionsPhase({
+  sprintNumber,
+  currentUser,
+}: ReviewActionsPhaseProps) {
   const prevSprint = useQuery(api.retro.getSessionBySprintId, {
     sprintNumber: sprintNumber - 1,
   });
@@ -17,6 +21,7 @@ export function ReviewActionsPhase({ sprintNumber }: ReviewActionsPhaseProps) {
   return prevSprint ? (
     <ActionItemPanel
       sessionId={prevSprint._id}
+      currentUser={currentUser}
       // onToggleComplete={toggleActionItemComplete}
     >
       <p className="text-sm text-foreground-muted">
