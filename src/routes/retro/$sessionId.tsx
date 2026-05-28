@@ -12,6 +12,7 @@ import { ParticipantList } from "#components/participant-list/ParticipantList.ts
 import type { Id } from "#convex/models";
 import type { Phase } from "#models/phase.model.ts";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
+import { Stepper } from "../../lib/retro/components/Stepper";
 import { useRetroEffects } from "../../lib/retro/hooks/useRetroEffects";
 import { useRetroSession } from "../../lib/retro/hooks/useRetroSession";
 import { AddTicketsPhase } from "../../lib/retro/phases/AddTicketsPhase";
@@ -305,11 +306,11 @@ function RetroBoard() {
   }
 
   return (
-    <div className="min-h-screen py-6 px-4 flex flex-col gap-4">
+    <div className="min-h-screen py-6 px-4 flex flex-col gap-4 items-center">
       <div className="flex flex-1 gap-6">
         <div className="w-64 flex flex-col gap-4">
+          <RetroHeader />
           <ParticipantList
-            title={`Sprint ${session.sprintNumber}`}
             participants={participants}
             scrumMaster={session.createdBy}
             currentUserName={name}
@@ -345,7 +346,7 @@ function RetroBoard() {
         </div>
 
         <div className="flex-1 gap-4 flex flex-col">
-          <RetroHeader phase={session.phase} />
+          <Stepper phase={session.phase} />
           {renderPhaseContent()}
         </div>
       </div>

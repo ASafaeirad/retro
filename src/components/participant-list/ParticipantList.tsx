@@ -21,18 +21,14 @@ interface Props {
   currentUserName?: string;
   sessionId: Id<"sessions">;
   onSelectPresenter?: (name: string) => void;
-  className?: string;
-  title: string;
 }
 
 export function ParticipantList({
-  title,
   participants,
   scrumMaster,
   currentUserName,
   sessionId,
   onSelectPresenter,
-  className,
 }: Props) {
   const updateMood = useMutation(api.retro.updateParticipantMood);
   const leaveSessionMutation = useMutation(api.retro.leaveSession);
@@ -86,7 +82,7 @@ export function ParticipantList({
   return (
     <Card space="compact">
       <CardHeader>
-        <h3>{title}</h3>
+        <h3>Participants</h3>
       </CardHeader>
       <CardContent>
         <div className="border rounded">
