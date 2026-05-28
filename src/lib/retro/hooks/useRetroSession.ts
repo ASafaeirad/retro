@@ -1,10 +1,13 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
+import type { Participant } from "#models/participant.model.ts";
 
 export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   const session = useQuery(api.retro.getSession, { sessionId });
-  const participants = useQuery(api.retro.getParticipants, { sessionId });
+  const participants = useQuery(api.retro.getParticipants, {
+    sessionId,
+  }) as Participant[];
   const tickets = useQuery(api.retro.getTickets, { sessionId });
   const ticketGroups = useQuery(api.retro.getTicketGroups, { sessionId });
   const votes = useQuery(api.retro.getVotes, { sessionId });
@@ -12,11 +15,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     api.retro.getParticipantVotes,
     name ? { sessionId, participantName: name } : "skip",
   );
-  const actionItems = useQuery(
-    api.retro.getActionItems,
-    session ? { sessionId: session._id } : "skip",
-  );
-
   const updatePhase = useMutation(api.retro.updatePhase);
   const toggleReady = useMutation(api.retro.toggleReady);
   const addTicket = useMutation(api.retro.addTicket);
@@ -33,7 +31,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   const resumeTimer = useMutation(api.retro.resumeTimer);
   const extendTimer = useMutation(api.retro.extendTimer);
   const completeDiscussion = useMutation(api.retro.completeDiscussion);
-  const createActionItem = useMutation(api.retro.createActionItem);
   const updateHeartbeat = useMutation(api.retro.updateHeartbeat);
   const leaveSession = useMutation(api.retro.leaveSession);
 
@@ -49,7 +46,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     ticketGroups,
     votes,
     myVotes,
-    actionItems,
     // Mutations
     updatePhase,
     toggleReady,
@@ -67,7 +63,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     resumeTimer,
     extendTimer,
     completeDiscussion,
-    createActionItem,
     updateHeartbeat,
     leaveSession,
     // Computed

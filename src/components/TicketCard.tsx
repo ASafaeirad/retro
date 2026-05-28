@@ -17,6 +17,7 @@ interface TicketCardProps {
   onEdit?: (text: string) => void;
   onDelete?: () => void;
   currentUserName?: string;
+  readonly?: boolean;
 }
 
 export function TicketCard({
@@ -30,6 +31,7 @@ export function TicketCard({
   onEdit,
   onDelete,
   currentUserName,
+  readonly,
 }: TicketCardProps) {
   const isAuthor = currentUserName && currentUserName === author;
   const [optimisticText, setOptimisticText] = useState(text);
@@ -44,7 +46,7 @@ export function TicketCard({
       space="compact"
       shadow={isDimmed ? "none" : "default"}
       className={cn("relative py-2 px-1 transition-all", {
-        grayscale: isDimmed,
+        "opacity-70 bg-muted": isDimmed,
       })}
     >
       <CardContent className="px-1">
@@ -77,6 +79,7 @@ export function TicketCard({
 
         <Textarea
           value={optimisticText}
+          readOnly={readonly || !onEdit || !isAuthor}
           onChange={(e) => {
             setOptimisticText(e.target.value);
             debouncedFn(e.target.value);

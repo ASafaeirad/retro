@@ -21,6 +21,7 @@ interface Props {
   currentUserName?: string;
   sessionId: Id<"sessions">;
   onSelectPresenter?: (name: string) => void;
+  selectedParticipant?: string;
 }
 
 export function ParticipantList({
@@ -29,6 +30,7 @@ export function ParticipantList({
   currentUserName,
   sessionId,
   onSelectPresenter,
+  selectedParticipant,
 }: Props) {
   const updateMood = useMutation(api.retro.updateParticipantMood);
   const leaveSessionMutation = useMutation(api.retro.leaveSession);
@@ -89,8 +91,9 @@ export function ParticipantList({
           {participants.map((participant) => {
             const isActive = isParticipantActive(participant.lastActiveAt);
             const mood = toMood(participant.mood);
-            const isCurrentUser = participant.name === currentUserName;
-            const canKick = isScrumMaster && !isCurrentUser && !isActive;
+            const isFocused = participant.name === selectedParticipant;
+            const canKick = isScrumMaster && !isFocused && !isActive;
+            const isMe = participant.name === currentUserName;
 
             return (
               // biome-ignore lint/a11y/useSemanticElements: We have a nested button
@@ -106,8 +109,7 @@ export function ParticipantList({
                 }}
                 className={cn("py-2 px-3 flex", {
                   "cursor-pointer": onSelectPresenter,
-                  "ring-2": onSelectPresenter && isCurrentUser,
-                  "opacity-50": onSelectPresenter,
+                  "bg-secondary-background": onSelectPresenter && isFocused,
                   "border-b border-b-border ":
                     participant._id !==
                     participants[participants.length - 1]._id,
@@ -117,7 +119,7 @@ export function ParticipantList({
                   <ParticipantMood
                     isInactive={!isActive}
                     mood={mood}
-                    disabled={!isCurrentUser}
+                    disabled={!isFocused}
                     onSelect={(newMood) => {
                       handleMoodChange(participant.name, newMood);
                     }}
@@ -147,7 +149,7 @@ export function ParticipantList({
                     <Crosshair />
                   </Button>
                 )}
-                {isCurrentUser && (
+                {isMe && (
                   <Button
                     size="icon"
                     onClick={() => leaveSession(participant.name)}

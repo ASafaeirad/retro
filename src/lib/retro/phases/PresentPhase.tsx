@@ -4,10 +4,10 @@ import { groupByCategory, type Ticket } from "#models/ticket.model.ts";
 
 interface Props {
   tickets: Ticket[];
-  selectedParticipantFilter: string | null;
+  selectedParticipant?: string;
 }
 
-export function PresentPhase({ tickets, selectedParticipantFilter }: Props) {
+export function PresentPhase({ tickets, selectedParticipant }: Props) {
   const { wellTickets, improveTickets } = groupByCategory(tickets);
 
   return (
@@ -18,8 +18,7 @@ export function PresentPhase({ tickets, selectedParticipantFilter }: Props) {
             key={ticket._id}
             {...ticket}
             isDimmed={
-              !!selectedParticipantFilter &&
-              ticket.author !== selectedParticipantFilter
+              !!selectedParticipant && ticket.author !== selectedParticipant
             }
           />
         ))}
@@ -30,14 +29,9 @@ export function PresentPhase({ tickets, selectedParticipantFilter }: Props) {
           <TicketCard
             key={ticket._id}
             {...ticket}
-            isHighlighted={
-              selectedParticipantFilter
-                ? ticket.author === selectedParticipantFilter
-                : false
-            }
             isDimmed={
-              selectedParticipantFilter
-                ? ticket.author !== selectedParticipantFilter
+              selectedParticipant
+                ? ticket.author !== selectedParticipant
                 : false
             }
           />

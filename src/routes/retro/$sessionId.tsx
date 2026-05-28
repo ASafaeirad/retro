@@ -1,9 +1,5 @@
 import type { DragEndEvent } from "@dnd-kit/react";
-import {
-  createFileRoute,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
@@ -11,6 +7,7 @@ import { PhaseControls } from "#components/PhaseControls.tsx";
 import { ParticipantList } from "#components/participant-list/ParticipantList.tsx";
 import type { Id } from "#convex/models";
 import type { Phase } from "#models/phase.model.ts";
+import type { TicketCategory } from "#models/ticket.model.ts";
 import { RetroHeader } from "../../lib/retro/components/RetroHeader";
 import { Stepper } from "../../lib/retro/components/Stepper";
 import { useRetroEffects } from "../../lib/retro/hooks/useRetroEffects";
@@ -36,15 +33,13 @@ export const Route = createFileRoute("/retro/$sessionId")({
 function RetroBoard() {
   const { sessionId } = Route.useParams() as { sessionId: Id<"sessions"> };
   const { name } = useSearch({ from: "/retro/$sessionId" });
-  const [selectedParticipantFilter, setSelectedParticipantFilter] =
-    useState<string>();
+  const [selectedParticipant, setSelectedParticipant] = useState<string>();
 
   const {
     session,
     participants,
     tickets,
     ticketGroups,
-    actionItems,
     isScrumMaster,
     currentParticipant,
     myVotes,
@@ -64,17 +59,13 @@ function RetroBoard() {
     removeVote,
     setVoteLimit,
     createGroup,
-    createActionItem,
   } = useRetroSession(sessionId, name);
 
   useRetroEffects({ sessionId, name, updateHeartbeat });
 
-  const navigate = useNavigate();
-
-  // Handle phase change
   const handlePhaseChange = async (phase: Phase) => {
     if (!isScrumMaster || !name) return;
-    setSelectedParticipantFilter(undefined);
+    setSelectedParticipant(undefined);
     await updatePhase({ sessionId, phase, requestedBy: name });
   };
 
@@ -87,7 +78,7 @@ function RetroBoard() {
   // Add ticket
   const handleAddTicket = async (
     text: string,
-    category: "well" | "improve",
+    category: TicketCategory,
     imageUrl?: string,
   ) => {
     if (!name) return;
@@ -205,16 +196,14 @@ function RetroBoard() {
       </div>
     );
   }
+  const sessionNumber = session.sprintNumber;
 
   // Render phase-specific content
   const renderPhaseContent = () => {
     switch (session.phase) {
       case "REVIEW_ACTIONS":
         return (
-          <ReviewActionsPhase
-            currentUser={name}
-            sprintNumber={session.sprintNumber}
-          />
+          <ReviewActionsPhase currentUser={name} sprintNumber={sessionNumber} />
         );
 
       case "ADD_TICKETS":
@@ -232,7 +221,7 @@ function RetroBoard() {
         return (
           <PresentPhase
             tickets={tickets}
-            selectedParticipantFilter={selectedParticipantFilter}
+            selectedParticipant={selectedParticipant}
           />
         );
 
@@ -316,10 +305,11 @@ function RetroBoard() {
             scrumMaster={session.createdBy}
             currentUserName={name}
             sessionId={session._id}
+            selectedParticipant={selectedParticipant}
             onSelectPresenter={
               session.phase === "PRESENT"
                 ? (name) => {
-                    setSelectedParticipantFilter((prev) =>
+                    setSelectedParticipant((prev) =>
                       prev === name ? undefined : name,
                     );
                   }
