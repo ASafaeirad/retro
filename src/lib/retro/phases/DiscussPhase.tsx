@@ -3,12 +3,13 @@ import { TicketCard } from "#components/TicketCard.tsx";
 import { Timer } from "#components/Timer.tsx";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
+import type { Ticket } from "#models/ticket.model.ts";
 import { Button } from "#ui/button.tsx";
 
 interface DiscussPhaseProps {
   session: any;
   sessionId: Id<"sessions">;
-  tickets: any[];
+  tickets: Ticket[];
   ticketGroups?: any[];
   isScrumMaster: boolean;
   onStartTimer: (duration: number, ticketId?: Id<"tickets">) => void;
@@ -92,14 +93,8 @@ export function DiscussPhase({
                   )}
                 </div>
                 <div className="grid grid-cols-4 gap-3">
-                  {item.tickets?.map((ticket: any) => (
-                    <TicketCard
-                      id={ticket._id}
-                      key={ticket._id}
-                      {...ticket}
-                      isGrouped
-                      voteLimit={0}
-                    />
+                  {item.tickets?.map((ticket: Ticket) => (
+                    <TicketCard key={ticket._id} {...ticket} />
                   ))}
                 </div>
               </div>

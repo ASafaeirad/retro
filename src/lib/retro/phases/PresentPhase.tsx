@@ -1,15 +1,13 @@
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
+import type { Ticket } from "#models/ticket.model.ts";
 
-interface PresentPhaseProps {
-  tickets: any[];
+interface Props {
+  tickets: Ticket[];
   selectedParticipantFilter: string | null;
 }
 
-export function PresentPhase({
-  tickets,
-  selectedParticipantFilter,
-}: PresentPhaseProps) {
+export function PresentPhase({ tickets, selectedParticipantFilter }: Props) {
   const wellTickets = tickets.filter((t) => t.category === "well");
   const improveTickets = tickets.filter((t) => t.category === "improve");
 
@@ -28,7 +26,6 @@ export function PresentPhase({
         <BoardColumn title="What Went Well" category="well">
           {wellTickets.map((ticket) => (
             <TicketCard
-              id={ticket._id}
               key={ticket._id}
               {...ticket}
               isHighlighted={
@@ -48,7 +45,6 @@ export function PresentPhase({
         <BoardColumn title="To Improve" category="improve">
           {improveTickets.map((ticket) => (
             <TicketCard
-              id={ticket._id}
               key={ticket._id}
               {...ticket}
               isHighlighted={

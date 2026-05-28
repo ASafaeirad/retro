@@ -1,13 +1,14 @@
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
 import type { Id } from "#convex/models";
+import type { Ticket, TicketCategory } from "#models/ticket.model.ts";
 
-interface AddTicketsPhaseProps {
-  tickets: any[];
+interface Props {
+  tickets: Ticket[];
   currentUserName: string;
   onAddTicket: (
     text: string,
-    category: "well" | "improve",
+    category: TicketCategory,
     imageUrl?: string,
   ) => Promise<unknown>;
   onDeleteTicket: (ticketId: Id<"tickets">) => void;
@@ -24,7 +25,7 @@ export function AddTicketsPhase({
   onAddTicket,
   onEditTicket,
   onDeleteTicket,
-}: AddTicketsPhaseProps) {
+}: Props) {
   const wellTickets = tickets.filter((t) => t.category === "well");
   const improveTickets = tickets.filter((t) => t.category === "improve");
 
@@ -41,7 +42,6 @@ export function AddTicketsPhase({
       >
         {wellTickets.map((ticket) => (
           <TicketCard
-            id={ticket._id}
             key={ticket._id}
             {...ticket}
             currentUserName={currentUserName}
@@ -60,15 +60,10 @@ export function AddTicketsPhase({
       >
         {improveTickets.map((ticket) => (
           <TicketCard
-            id={ticket._id}
             key={ticket._id}
             {...ticket}
             currentUserName={currentUserName}
-            onEdit={(text) => {
-              console.log("YO? Or not");
-
-              return onEditTicket(ticket._id, text, ticket.imageUrl);
-            }}
+            onEdit={(text) => onEditTicket(ticket._id, text, ticket.imageUrl)}
             onDelete={() => onDeleteTicket(ticket._id)}
           />
         ))}

@@ -2,11 +2,12 @@ import { useState } from "react";
 import { TicketCard } from "#components/TicketCard.tsx";
 import { Input } from "#components/ui/input.tsx";
 import type { Id } from "#convex/models";
+import type { Ticket } from "#models/ticket.model.ts";
 import { Button } from "#ui/button.tsx";
 
 interface VotePhaseProps {
   session: any;
-  tickets: any[];
+  tickets: Ticket[];
   ticketGroups?: any[];
   myVotes?: any[];
   isScrumMaster: boolean;
@@ -113,7 +114,6 @@ export function VotePhase({
               <TicketCard
                 key={ticket._id}
                 {...ticket}
-                id={ticket._id}
                 hasVoted={hasVoted}
                 onVote={
                   session.voteLimit ? () => onVote(ticket._id) : undefined

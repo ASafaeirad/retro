@@ -8,9 +8,8 @@ import { Textarea } from "./ui/textarea";
 
 interface TicketCardProps {
   text: string;
-  author: string;
+  author?: string;
   imageUrl?: string;
-  voteLimit: number;
   isHighlighted?: boolean;
   isDimmed?: boolean;
   hasVoted?: boolean; // Whether the current user has voted on this ticket
@@ -26,7 +25,6 @@ export function TicketCard({
   text,
   author,
   imageUrl,
-  voteLimit,
   isHighlighted = false,
   isDimmed = false,
   hasVoted = false,

@@ -6,9 +6,10 @@ import {
 import type { ReactNode } from "react";
 import { DraggableTicketCard } from "#components/DraggableTicketCard.tsx";
 import { cn } from "#lib/cn";
+import type { Ticket } from "#models/ticket.model.ts";
 
 interface GroupPhaseProps {
-  tickets: any[];
+  tickets: Ticket[];
   ticketGroups?: any[];
   onDragEnd: (event: DragEndEvent) => void;
 }
