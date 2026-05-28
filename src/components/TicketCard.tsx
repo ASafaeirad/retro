@@ -10,7 +10,6 @@ interface TicketCardProps {
   text: string;
   author?: string;
   imageUrl?: string;
-  isHighlighted?: boolean;
   isDimmed?: boolean;
   hasVoted?: boolean; // Whether the current user has voted on this ticket
   onClick?: () => void;
@@ -18,14 +17,12 @@ interface TicketCardProps {
   onEdit?: (text: string) => void;
   onDelete?: () => void;
   currentUserName?: string;
-  className?: string;
 }
 
 export function TicketCard({
   text,
   author,
   imageUrl,
-  isHighlighted = false,
   isDimmed = false,
   hasVoted = false,
   onClick,
@@ -33,7 +30,6 @@ export function TicketCard({
   onEdit,
   onDelete,
   currentUserName,
-  className,
 }: TicketCardProps) {
   const isAuthor = currentUserName && currentUserName === author;
   const [optimisticText, setOptimisticText] = useState(text);
@@ -46,15 +42,10 @@ export function TicketCard({
       variant="main"
       onClick={onClick}
       space="compact"
-      className={cn(
-        "relative py-2 px-1",
-        {
-          "ring-2": isHighlighted,
-          "opacity-40": isDimmed,
-          "cursor-pointer": onClick,
-        },
-        className,
-      )}
+      shadow={isDimmed ? "none" : "default"}
+      className={cn("relative py-2 px-1 transition-all", {
+        grayscale: isDimmed,
+      })}
     >
       <CardContent className="px-1">
         {isAuthor && onDelete && (

@@ -74,6 +74,7 @@ function RetroBoard() {
   // Handle phase change
   const handlePhaseChange = async (phase: Phase) => {
     if (!isScrumMaster || !name) return;
+    setSelectedParticipantFilter(undefined);
     await updatePhase({ sessionId, phase, requestedBy: name });
   };
 
@@ -306,7 +307,7 @@ function RetroBoard() {
   }
 
   return (
-    <div className="min-h-screen py-6 px-4 flex flex-col gap-4 items-center">
+    <div className="min-h-screen py-6 px-4 flex flex-col gap-4 items-center-safe">
       <div className="flex flex-1 gap-6">
         <div className="w-64 flex flex-col gap-4">
           <RetroHeader />

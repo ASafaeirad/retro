@@ -1,5 +1,6 @@
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
+import { Button } from "#components/ui/button.tsx";
 import type { Id } from "#convex/models";
 import type { Ticket, TicketCategory } from "#models/ticket.model.ts";
 
@@ -40,6 +41,13 @@ export function AddTicketsPhase({
         category="well"
         onAdd={() => handleAddTicket("well")}
       >
+        <Button
+          onClick={() => handleAddTicket("well")}
+          variant="neutral"
+          className="w-full"
+        >
+          + Add Ticket
+        </Button>
         {wellTickets.map((ticket) => (
           <TicketCard
             key={ticket._id}
@@ -58,6 +66,13 @@ export function AddTicketsPhase({
         category="improve"
         onAdd={() => handleAddTicket("improve")}
       >
+        <Button
+          onClick={() => handleAddTicket("improve")}
+          variant="neutral"
+          className="w-full"
+        >
+          + Add Ticket
+        </Button>
         {improveTickets.map((ticket) => (
           <TicketCard
             key={ticket._id}

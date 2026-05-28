@@ -29,12 +29,7 @@ export function BoardColumn({
         <h2>{title}</h2>
       </CardHeader>
 
-      <CardContent className="gap-4">
-        <Button onClick={onAdd} variant="neutral" className="w-full">
-          + Add Ticket
-        </Button>
-        {children}
-      </CardContent>
+      <CardContent className="gap-4">{children}</CardContent>
     </Card>
   );
 }

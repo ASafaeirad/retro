@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "#lib/cn";
 
 const cardVariants = cva(
-  "rounded-base flex flex-col shadow-shadow border-2 border-border text-foreground font-base",
+  "rounded-base flex flex-col border-2 border-border text-foreground font-base",
   {
     variants: {
       space: {
@@ -13,10 +13,15 @@ const cardVariants = cva(
         default: "bg-card",
         main: "bg-secondary-background",
       },
+      shadow: {
+        default: "shadow-shadow",
+        none: "shadow-none",
+      },
     },
     defaultVariants: {
       variant: "default",
       space: "default",
+      shadow: "default",
     },
   },
 );
@@ -25,12 +30,13 @@ function Card({
   className,
   variant,
   space,
+  shadow,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
-      className={cn(cardVariants({ variant, space }), className)}
+      className={cn(cardVariants({ variant, space, shadow }), className)}
       {...props}
     />
   );
