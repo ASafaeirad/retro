@@ -14,6 +14,9 @@ importers:
       '@dnd-kit/react':
         specifier: 0.4.0
         version: 0.4.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@fullstacksjs/toolbox':
+        specifier: 4.22.0
+        version: 4.22.0
       '@radix-ui/react-avatar':
         specifier: 1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -458,6 +461,10 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
+
+  '@fullstacksjs/toolbox@4.22.0':
+    resolution: {integrity: sha512-gr9YBfijzIMAAaqNQ8Wvdky+EH1oqRFTNLFU/xcJ4YoPurU1SeQDVjLsOKZiyBPgKAW62hedh7z1tdzcLqbrWw==}
+    engines: {node: '>=20'}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -2509,6 +2516,8 @@ snapshots:
       react-dom: 19.2.6(react@19.2.6)
 
   '@floating-ui/utils@0.2.11': {}
+
+  '@fullstacksjs/toolbox@4.22.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
