@@ -1,3 +1,4 @@
+import { debounce } from "@fullstacksjs/toolbox";
 import { ThumbsUp, Trash } from "lucide-react";
 import { useState } from "react";
 import type { Id } from "#convex/models";
@@ -12,14 +13,12 @@ interface TicketCardProps {
   author: string;
   imageUrl?: string;
   voteLimit: number;
-  category: "well" | "improve";
   isHighlighted?: boolean;
   isDimmed?: boolean;
-  isGrouped?: boolean;
   hasVoted?: boolean; // Whether the current user has voted on this ticket
   onClick?: () => void;
   onVote?: () => void;
-  onEdit?: () => void;
+  onEdit?: (text: string) => void;
   onDelete?: () => void;
   currentUserName?: string;
   className?: string;
@@ -30,10 +29,8 @@ export function TicketCard({
   author,
   imageUrl,
   voteLimit,
-  category,
   isHighlighted = false,
   isDimmed = false,
-  isGrouped = false,
   hasVoted = false,
   onClick,
   onVote,
@@ -43,6 +40,10 @@ export function TicketCard({
   className,
 }: TicketCardProps) {
   const isAuthor = currentUserName && currentUserName === author;
+  const [optimisticText, setOptimisticText] = useState(text);
+  const [debouncedFn] = useState(() =>
+    debounce({ delay: 1000 }, (text: string) => onEdit?.(text)),
+  );
 
   return (
     <Card
@@ -90,8 +91,11 @@ export function TicketCard({
       )} */}
 
         <Textarea
-          value={text}
-          // onChange={(e) => setNewText(e.target.value)}
+          value={optimisticText}
+          onChange={(e) => {
+            setOptimisticText(e.target.value);
+            debouncedFn(e.target.value);
+          }}
           placeholder="Action item description..."
           rows={2}
           autoFocus
