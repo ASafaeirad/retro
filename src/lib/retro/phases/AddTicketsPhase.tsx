@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { AddTicketForm } from "#components/AddTicketForm.tsx";
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
 import type { Id } from "#convex/models";
@@ -11,13 +9,13 @@ interface AddTicketsPhaseProps {
     text: string,
     category: "well" | "improve",
     imageUrl?: string,
-  ) => Promise<void>;
+  ) => Promise<unknown>;
   onDeleteTicket: (ticketId: Id<"tickets">) => void;
   onEditTicket: (
     ticketId: Id<"tickets">,
     text: string,
     imageUrl?: string,
-  ) => Promise<void>;
+  ) => Promise<unknown>;
 }
 
 export function AddTicketsPhase({
@@ -27,17 +25,11 @@ export function AddTicketsPhase({
   onEditTicket,
   onDeleteTicket,
 }: AddTicketsPhaseProps) {
-  const [addingTicketCategory, setAddingTicketCategory] = useState<
-    "well" | "improve"
-  >();
-
   const wellTickets = tickets.filter((t) => t.category === "well");
   const improveTickets = tickets.filter((t) => t.category === "improve");
 
-  const handleAddTicket = async (text: string, imageUrl?: string) => {
-    if (!addingTicketCategory) return;
-    await onAddTicket(text, addingTicketCategory, imageUrl);
-    setAddingTicketCategory(undefined);
+  const handleAddTicket = async (category: "well" | "improve") => {
+    await onAddTicket("", category);
   };
 
   return (
@@ -45,7 +37,7 @@ export function AddTicketsPhase({
       <BoardColumn
         title="What Went Well"
         category="well"
-        onAdd={() => setAddingTicketCategory("well")}
+        onAdd={() => handleAddTicket("well")}
       >
         {wellTickets.map((ticket) => (
           <TicketCard
@@ -59,22 +51,12 @@ export function AddTicketsPhase({
             onDelete={() => onDeleteTicket(ticket._id)}
           />
         ))}
-
-        {addingTicketCategory === "well" ? (
-          <AddTicketForm
-            category="well"
-            onSubmit={handleAddTicket}
-            onCancel={() => setAddingTicketCategory(undefined)}
-          />
-        ) : null}
       </BoardColumn>
 
       <BoardColumn
         title="To Improve"
         category="improve"
-        onAdd={() => {
-          () => setAddingTicketCategory("improve");
-        }}
+        onAdd={() => handleAddTicket("improve")}
       >
         {improveTickets.map((ticket) => (
           <TicketCard
@@ -90,14 +72,6 @@ export function AddTicketsPhase({
             onDelete={() => onDeleteTicket(ticket._id)}
           />
         ))}
-
-        {addingTicketCategory === "improve" ? (
-          <AddTicketForm
-            category="improve"
-            onSubmit={handleAddTicket}
-            onCancel={() => setAddingTicketCategory(undefined)}
-          />
-        ) : null}
       </BoardColumn>
     </div>
   );
