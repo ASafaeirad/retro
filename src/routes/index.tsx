@@ -26,24 +26,19 @@ function RetroSessionsPage() {
     sprintNumber: string;
     creatorName: string;
   }) => {
-    if (!sprintNumber || !creatorName.trim()) return;
+    const name = creatorName.trim();
+    if (!sprintNumber || !name) return;
 
     try {
       const token = generateToken();
       const sessionId = await createSession({
         sprintNumber: Number(sprintNumber),
-        creatorName: creatorName.trim(),
+        creatorName: name,
         sessionToken: token,
       });
 
-      // Store session credentials in localStorage
-      storeSession(sessionId, creatorName.trim(), token);
-
-      // Navigate to the new session
-      navigate({
-        to: `/retro/${sessionId}`,
-        search: { name: creatorName.trim() },
-      });
+      storeSession(sessionId, name, token);
+      navigate({ to: `/retro/${sessionId}`, search: { name } });
     } catch (error) {
       console.error("Failed to create session:", error);
       alert("Failed to create session. Please try again.");
@@ -86,10 +81,11 @@ function RetroSessionsPage() {
 
       {sessions.length === 0 && (
         <div>
-          <div className="grid content-center p-8">
+          <div className="flex flex-col items-center gap-4 content-center p-6">
             <p className="text-center">
               No sessions yet. Create your first retro session to get started!
             </p>
+            <Button onClick={() => setIsCreating(true)}>+ Create</Button>
           </div>
           <hr className="border-t-0 border-b-2" />
         </div>

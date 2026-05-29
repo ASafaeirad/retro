@@ -1,5 +1,7 @@
+import type { Id } from "#convex/models";
+
 export interface Session {
-  _id: string;
+  _id: Id<"sessions">;
   sprintNumber: number;
   phase: string;
   participantCount: number;

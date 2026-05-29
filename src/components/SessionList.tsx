@@ -1,6 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useMutation } from "convex/react";
+import { Trash2 } from "lucide-react";
+import { api } from "#convex/api";
 import type { Session } from "#models/session.ts";
-
 import { Button } from "#ui/button.tsx";
 import { Card, CardAction, CardContent } from "#ui/card.tsx";
 
@@ -35,6 +37,7 @@ export const SessionList = ({ sessions, children, title }: Props) => {
 
 export const SessionCard = ({ session }: { session: Session }) => {
   const navigate = useNavigate();
+  const deleteSessionMutation = useMutation(api.retro.deleteSession);
 
   const handleJoinSession = async () => {
     try {
@@ -45,11 +48,37 @@ export const SessionCard = ({ session }: { session: Session }) => {
     }
   };
 
+  const handleDeleteSession = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this session? This action cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await deleteSessionMutation({ sessionId: session._id });
+      console.log("deleted");
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+      alert("Failed to delete session. Please try again.");
+    }
+  };
+
   return (
     <Card className="py-3" key={session._id}>
       <CardContent className="justify-between flex-row items-center">
         <h3 className="flex-1">Sprint {session.sprintNumber}</h3>
-        <CardAction>
+        <CardAction className="flex gap-1">
+          <Button
+            variant="danger"
+            size="sm"
+            shadow="reverse"
+            onClick={handleDeleteSession}
+          >
+            <Trash2 />
+          </Button>
           <Button
             variant={!session.isActive ? "neutral" : "default"}
             size="sm"

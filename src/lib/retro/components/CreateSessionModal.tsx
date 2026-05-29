@@ -3,25 +3,21 @@ import { Input } from "#components/ui/input.tsx";
 import { Label } from "#components/ui/label.tsx";
 import { Button } from "#ui/button.tsx";
 
-export const CreateSessionModal = ({
-  onClose,
-  onCreate,
-}: {
+type Props = {
   onClose?: () => void;
-  onCreate?: ({
-    sprintNumber,
-    creatorName,
-  }: {
-    sprintNumber: string;
-    creatorName: string;
-  }) => void;
-}) => {
+  onCreate?: (p: { sprintNumber: string; creatorName: string }) => void;
+};
+
+export const CreateSessionModal = ({ onClose, onCreate }: Props) => {
   const [sprintNumber, setSprintNumber] = useState("");
   const [creatorName, setCreatorName] = useState("");
 
   return (
     <form
-      onSubmit={() => onCreate?.({ sprintNumber, creatorName })}
+      onSubmit={(e) => {
+        e.preventDefault();
+        onCreate?.({ sprintNumber, creatorName });
+      }}
       className="space-y-4 mb-8"
     >
       <div>
