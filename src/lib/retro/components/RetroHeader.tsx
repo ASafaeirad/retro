@@ -2,6 +2,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { LogOut } from "lucide-react";
 import { Card } from "#components/ui/card.tsx";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  Confirm,
+} from "#components/ui/confirm.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
@@ -17,11 +22,6 @@ export function RetroHeader({ sessionId, participantName }: Props) {
   const navigate = useNavigate();
   const leaveSessionMutation = useMutation(api.retro.leaveSession);
   const leaveSession = async (name: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to leave this session? You can rejoin later with the same name.",
-    );
-    if (!confirmed) return;
-
     try {
       await leaveSessionMutation({ sessionId, participantName: name });
       clearSession(sessionId);
@@ -39,15 +39,23 @@ export function RetroHeader({ sessionId, participantName }: Props) {
       </h3>
 
       {participantName && (
-        <Button
-          size="icon"
-          onClick={() => leaveSession(participantName)}
-          variant="danger"
-          shadow="reverse"
-          title="Leave session"
-        >
-          <LogOut />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              size="icon"
+              variant="danger"
+              shadow="reverse"
+              title="Leave session"
+            >
+              <LogOut />
+            </Button>
+          </AlertDialogTrigger>
+          <Confirm
+            title="Leave session"
+            description="Are you sure you want to leave this session? You can rejoin later with the same name."
+            onConfirm={() => leaveSession(participantName)}
+          />
+        </AlertDialog>
       )}
     </Card>
   );

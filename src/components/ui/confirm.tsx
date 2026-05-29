@@ -138,7 +138,7 @@ export function AlertDialogCancel({
     />
   );
 }
-export default function Confirm({
+export function Confirm({
   title,
   description,
   onConfirm,
