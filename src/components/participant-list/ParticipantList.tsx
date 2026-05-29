@@ -119,10 +119,10 @@ export function ParticipantList({
                   <ParticipantMood
                     isInactive={!isActive}
                     mood={mood}
-                    disabled={!isFocused}
-                    onSelect={(newMood) => {
-                      handleMoodChange(participant.name, newMood);
-                    }}
+                    disabled={!isMe}
+                    onSelect={(newMood) =>
+                      handleMoodChange(participant.name, newMood)
+                    }
                   />
                   <span
                     className={cn("text-sm", {
