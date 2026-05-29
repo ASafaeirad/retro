@@ -9,9 +9,9 @@ import {
 } from "#components/ui/confirm.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
+import { clearSession } from "#lib/auth";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
-import { clearSession } from "../../participantAuth";
 
 type Props = {
   sessionId: Id<"sessions">;

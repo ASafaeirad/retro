@@ -5,9 +5,9 @@ import { TicketCard } from "./TicketCard";
 interface DraggableTicketCardProps {
   id: Id<"tickets">;
   text: string;
-  author: string;
+  author?: string;
   imageUrl?: string;
-  voteLimit: number;
+  voteLimit?: number;
   category: "well" | "improve";
   isHighlighted?: boolean;
   isDimmed?: boolean;
@@ -36,9 +36,7 @@ export function DraggableTicketCard(props: DraggableTicketCardProps) {
     <div ref={setRefs}>
       <TicketCard
         {...props}
-        className={
-          isDropTarget ? "ring-2 ring-[var(--lagoon)]" : props.className
-        }
+        className={isDropTarget ? "ring-2" : props.className}
       />
     </div>
   );

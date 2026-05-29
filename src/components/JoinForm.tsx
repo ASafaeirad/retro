@@ -12,11 +12,7 @@ import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import type { Mood } from "#models/mood.model.tsx";
 import { Button } from "#ui/button.tsx";
-import {
-  generateToken,
-  getStoredSession,
-  storeSession,
-} from "../lib/participantAuth";
+import { generateToken, getStoredSession, storeSession } from "../lib/auth";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 

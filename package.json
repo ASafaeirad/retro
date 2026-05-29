@@ -6,6 +6,7 @@
     "#convex/api": "./convex/_generated/api.js",
     "#models/*": "./src/models/*",
     "#lib/cn": "./src/lib/cn.ts",
+    "#lib/auth": "./src/lib/auth.ts",
     "#lib/result": "./src/lib/result.ts",
     "#lib/convex/*": "./src/lib/convex/*",
     "#lib/config": "./src/lib/config.ts",

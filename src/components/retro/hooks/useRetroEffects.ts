@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import type { Id } from "#convex/models";
-import { getStoredSession } from "../../participantAuth";
+import { getStoredSession } from "#lib/auth";
 
 interface UseRetroEffectsProps {
   sessionId: Id<"sessions">;

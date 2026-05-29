@@ -5,21 +5,21 @@ import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
 import { ParticipantList } from "#components/participant-list/ParticipantList.tsx";
+import { AddTicketsPhase } from "#components/phases/AddTicketsPhase.tsx";
+import { CompletedPhase } from "#components/phases/CompletedPhase.tsx";
+import { DiscussPhase } from "#components/phases/DiscussPhase.tsx";
+import { GroupPhase } from "#components/phases/GroupPhase.tsx";
+import { ImReadyControl } from "#components/phases/ImReadyControl.tsx";
+import { PresentPhase } from "#components/phases/PresentPhase.tsx";
+import { ReviewActionsPhase } from "#components/phases/ReviewActionsPhase.tsx";
+import { VotePhase } from "#components/phases/VotePhase.tsx";
+import { RetroHeader } from "#components/retro/components/RetroHeader.tsx";
+import { Stepper } from "#components/retro/components/Stepper.tsx";
+import { useRetroEffects } from "#components/retro/hooks/useRetroEffects.ts";
+import { useRetroSession } from "#components/retro/hooks/useRetroSession.ts";
 import type { Id } from "#convex/models";
 import type { Phase } from "#models/phase.model.ts";
 import type { TicketCategory } from "#models/ticket.model.ts";
-import { RetroHeader } from "../../lib/retro/components/RetroHeader";
-import { Stepper } from "../../lib/retro/components/Stepper";
-import { useRetroEffects } from "../../lib/retro/hooks/useRetroEffects";
-import { useRetroSession } from "../../lib/retro/hooks/useRetroSession";
-import { AddTicketsPhase } from "../../lib/retro/phases/AddTicketsPhase";
-import { CompletedPhase } from "../../lib/retro/phases/CompletedPhase";
-import { DiscussPhase } from "../../lib/retro/phases/DiscussPhase";
-import { GroupPhase } from "../../lib/retro/phases/GroupPhase";
-import { ImReadyControl } from "../../lib/retro/phases/ImReadyControl";
-import { PresentPhase } from "../../lib/retro/phases/PresentPhase";
-import { ReviewActionsPhase } from "../../lib/retro/phases/ReviewActionsPhase";
-import { VotePhase } from "../../lib/retro/phases/VotePhase";
 
 export const Route = createFileRoute("/retro/$sessionId")({
   component: RetroBoard,
