@@ -1,5 +1,5 @@
-import { defineSchema, defineTable } from 'convex/server'
-import { v } from 'convex/values'
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
 
 export default defineSchema({
   products: defineTable({
@@ -15,13 +15,13 @@ export default defineSchema({
   sessions: defineTable({
     sprintNumber: v.number(),
     phase: v.union(
-      v.literal('REVIEW_ACTIONS'),
-      v.literal('ADD_TICKETS'),
-      v.literal('PRESENT'),
-      v.literal('GROUP'),
-      v.literal('VOTE'),
-      v.literal('DISCUSS'),
-      v.literal('COMPLETED')
+      v.literal("REVIEW_ACTIONS"),
+      v.literal("ADD_TICKETS"),
+      v.literal("PRESENT"),
+      v.literal("GROUP"),
+      v.literal("VOTE"),
+      v.literal("DISCUSS"),
+      v.literal("COMPLETED"),
     ),
     createdBy: v.string(), // participant name (scrum master)
     voteLimit: v.optional(v.number()),
@@ -32,16 +32,16 @@ export default defineSchema({
         duration: v.number(), // milliseconds
         isPaused: v.boolean(),
         pausedAt: v.optional(v.number()),
-      })
+      }),
     ),
-    currentDiscussionTicket: v.optional(v.id('tickets')),
+    currentDiscussionTicket: v.optional(v.id("tickets")),
     isActive: v.boolean(), // false when completed
   })
-    .index('sprintNumber', ['sprintNumber'])
-    .index('isActive', ['isActive']),
+    .index("sprintNumber", ["sprintNumber"])
+    .index("isActive", ["isActive"]),
 
   participants: defineTable({
-    sessionId: v.id('sessions'),
+    sessionId: v.id("sessions"),
     name: v.string(),
     isReady: v.boolean(),
     joinedAt: v.number(),
@@ -49,45 +49,45 @@ export default defineSchema({
     lastActiveAt: v.number(),
     mood: v.optional(v.string()),
   })
-    .index('sessionId', ['sessionId'])
-    .index('sessionAndName', ['sessionId', 'name'])
-    .index('sessionAndToken', ['sessionId', 'sessionToken']),
+    .index("sessionId", ["sessionId"])
+    .index("sessionAndName", ["sessionId", "name"])
+    .index("sessionAndToken", ["sessionId", "sessionToken"]),
 
   tickets: defineTable({
-    sessionId: v.id('sessions'),
+    sessionId: v.id("sessions"),
     text: v.string(),
     author: v.string(), // participant name
-    category: v.union(v.literal('well'), v.literal('improve')),
+    category: v.union(v.literal("well"), v.literal("improve")),
     imageUrl: v.optional(v.string()),
-    groupId: v.optional(v.id('ticketGroups')),
+    groupId: v.optional(v.id("ticketGroups")),
     order: v.number(), // for sorting
   })
-    .index('sessionId', ['sessionId'])
-    .index('sessionAndCategory', ['sessionId', 'category'])
-    .index('groupId', ['groupId']),
+    .index("sessionId", ["sessionId"])
+    .index("sessionAndCategory", ["sessionId", "category"])
+    .index("groupId", ["groupId"]),
 
   ticketGroups: defineTable({
-    sessionId: v.id('sessions'),
+    sessionId: v.id("sessions"),
     name: v.optional(v.string()), // optional group name
-  }).index('sessionId', ['sessionId']),
+  }).index("sessionId", ["sessionId"]),
 
   votes: defineTable({
-    sessionId: v.id('sessions'),
+    sessionId: v.id("sessions"),
     participantName: v.string(),
-    ticketId: v.optional(v.id('tickets')),
-    groupId: v.optional(v.id('ticketGroups')),
+    ticketId: v.optional(v.id("tickets")),
+    groupId: v.optional(v.id("ticketGroups")),
   })
-    .index('sessionId', ['sessionId'])
-    .index('sessionAndParticipant', ['sessionId', 'participantName'])
-    .index('ticketId', ['ticketId'])
-    .index('groupId', ['groupId']),
+    .index("sessionId", ["sessionId"])
+    .index("sessionAndParticipant", ["sessionId", "participantName"])
+    .index("ticketId", ["ticketId"])
+    .index("groupId", ["groupId"]),
 
   actionItems: defineTable({
     text: v.string(),
     assignee: v.optional(v.string()), // participant name
-    createdInSession: v.id('sessions'),
+    createdInSession: v.id("sessions"),
     completed: v.boolean(),
     completedAt: v.optional(v.number()),
-    relatedTicketId: v.optional(v.id('tickets')),
-  }).index('createdInSession', ['createdInSession']),
-})
+    relatedTicketId: v.optional(v.id("tickets")),
+  }).index("createdInSession", ["createdInSession"]),
+});

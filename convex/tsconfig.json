@@ -13,7 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "paths": {
       "#models/*": ["../src/models/*"],
-      "#convex/models": ["./convex/_generated/dataModel.d.ts"],
+      "#convex/models": ["./convex/_generated/dataModel.d.ts"]
     },
 
     /* These compiler options are required by Convex */
