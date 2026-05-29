@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { cn } from "#lib/cn";
 
 const paths = [
   [
@@ -17,28 +18,57 @@ const paths = [
   ],
 ];
 
-export const Logo = (props: React.SVGProps<SVGSVGElement>) => {
-  const [iteration, setIteration] = useState(0);
+const colorClasses = [
+  "text-red-900",
+  "text-orange-900",
+  "text-yellow-900",
+  "text-green-900",
+  "text-blue-900",
+  "text-indigo-900",
+  "text-purple-900",
+];
 
-  useEffect(() => {
+export const Logo = ({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) => {
+  const [iteration, setIteration] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout>(undefined);
+  const [colorClass, setColorClass] = useState(colorClasses[0]);
+
+  const retriggerAnimation = useCallback(() => {
     let counter = 0;
-    const interval = setInterval(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
       setIteration((prev) => (prev + 1) % paths.length);
+      setColorClass(
+        colorClasses[Math.floor(Math.random() * colorClasses.length)],
+      );
       counter++;
       if (counter >= paths.length * 2 + Math.random() * paths.length) {
-        clearInterval(interval);
+        clearInterval(intervalRef.current);
       }
     }, 100);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalRef.current);
   }, []);
 
+  useEffect(() => {
+    return retriggerAnimation();
+  }, [retriggerAnimation]);
+
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: this is for fun
     <svg
       width="300"
       height="273"
       viewBox="0 0 300 273"
       fill="currentColor"
+      onClick={retriggerAnimation}
+      className={cn("cursor-pointer", colorClass, className)}
       {...props}
     >
       <title>Retro</title>
@@ -46,26 +76,11 @@ export const Logo = (props: React.SVGProps<SVGSVGElement>) => {
         // biome-ignore lint/suspicious/noArrayIndexKey: intentional
         <path key={index} d={d}></path>
       ))}
-      <path
-        d="M248 240H243H238H233H228H223V235H218V230V225V220V215V210V205H223V200H228H233H238H243H248H253V205H258V210V215V220V225V230V235H253V240H248ZM243 230H248V225V220V215V210H243H238H233H228V215V220V225V230H233H238H243Z"
-        fill="black"
-      />
-      <path
-        d="M208 240H203V235V230H198H193H188H183V235V240H178H173V235V230V225V220V215V210V205V200H178H183H188H193H198H203H208V205H213V210V215V220H208V225H213V230V235V240H208ZM198 220H203V215V210H198H193H188H183V215V220H188H193H198Z"
-        fill="black"
-      />
-      <path
-        d="M148 240H143V235V230V225V220V215V210H138H133H128V205V200H133H138H143H148H153H158H163H168V205V210H163H158H153V215V220V225V230V235V240H148Z"
-        fill="black"
-      />
-      <path
-        d="M118 240H113H108H103H98H93H88H83V235V230V225V220V215V210V205V200H88H93H98H103H108H113H118H123V205V210H118H113H108H103H98H93V215H98H103H108H113H118V220V225H113H108H103H98H93V230H98H103H108H113H118H123V235V240H118Z"
-        fill="black"
-      />
-      <path
-        d="M73 240H68V235V230H63H58H53H48V235V240H43H38V235V230V225V220V215V210V205V200H43H48H53H58H63H68H73V205H78V210V215V220H73V225H78V230V235V240H73ZM63 220H68V215V210H63H58H53H48V215V220H53H58H63Z"
-        fill="black"
-      />
+      <path d="M248 240H243H238H233H228H223V235H218V230V225V220V215V210V205H223V200H228H233H238H243H248H253V205H258V210V215V220V225V230V235H253V240H248ZM243 230H248V225V220V215V210H243H238H233H228V215V220V225V230H233H238H243Z" />
+      <path d="M208 240H203V235V230H198H193H188H183V235V240H178H173V235V230V225V220V215V210V205V200H178H183H188H193H198H203H208V205H213V210V215V220H208V225H213V230V235V240H208ZM198 220H203V215V210H198H193H188H183V215V220H188H193H198Z" />
+      <path d="M148 240H143V235V230V225V220V215V210H138H133H128V205V200H133H138H143H148H153H158H163H168V205V210H163H158H153V215V220V225V230V235V240H148Z" />
+      <path d="M118 240H113H108H103H98H93H88H83V235V230V225V220V215V210V205V200H88H93H98H103H108H113H118H123V205V210H118H113H108H103H98H93V215H98H103H108H113H118V220V225H113H108H103H98H93V230H98H103H108H113H118H123V235V240H118Z" />
+      <path d="M73 240H68V235V230H63H58H53H48V235V240H43H38V235V230V225V220V215V210V205V200H43H48H53H58H63H68H73V205H78V210V215V220H73V225H78V230V235V240H73ZM63 220H68V215V210H63H58H53H48V215V220H53H58H63Z" />
     </svg>
   );
 };
