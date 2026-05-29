@@ -1,6 +1,6 @@
 import { debounce } from "@fullstacksjs/toolbox";
 import { ThumbsUp, Trash } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -38,6 +38,9 @@ export function TicketCard({
   const [debouncedFn] = useState(() =>
     debounce({ delay: 1000 }, (text: string) => onEdit?.(text)),
   );
+  useEffect(() => {
+    setOptimisticText(text);
+  }, [text]);
 
   return (
     <Card
@@ -85,7 +88,7 @@ export function TicketCard({
             debouncedFn(e.target.value);
           }}
           placeholder="Action item description..."
-          rows={2}
+          className="pb-2"
           autoFocus
         />
       </CardContent>

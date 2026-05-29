@@ -23,6 +23,7 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   const setCurrentPresenter = useMutation(api.retro.setCurrentPresenter);
   const createGroup = useMutation(api.retro.createGroup);
   const addTicketToGroup = useMutation(api.retro.addTicketToGroup);
+  const mergeTickets = useMutation(api.retro.mergeTickets);
   const castVote = useMutation(api.retro.castVote);
   const removeVote = useMutation(api.retro.removeVote);
   const setVoteLimit = useMutation(api.retro.setVoteLimit);
@@ -55,6 +56,7 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     setCurrentPresenter,
     createGroup,
     addTicketToGroup,
+    mergeTickets,
     castVote,
     removeVote,
     setVoteLimit,

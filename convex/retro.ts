@@ -788,3 +788,28 @@ export const deleteActionItem = mutation({
     await ctx.db.delete(args.actionItemId);
   },
 });
+
+export const mergeTickets = mutation({
+  args: {
+    sourceTicketId: v.id("tickets"),
+    targetTicketId: v.id("tickets"),
+  },
+  handler: async (ctx, args) => {
+    const source = await ctx.db.get(args.sourceTicketId);
+    const target = await ctx.db.get(args.targetTicketId);
+    if (!source || !target) throw new Error("Ticket not found");
+
+    await ctx.db.patch(args.targetTicketId, {
+      text: `${target.text.trim()}\n------ (${target.author})\n${source.text.trim()}`,
+      author: source.author,
+    });
+
+    const votes = await ctx.db
+      .query("votes")
+      .withIndex("ticketId", (q) => q.eq("ticketId", args.sourceTicketId))
+      .collect();
+    for (const vote of votes) await ctx.db.delete(vote._id);
+
+    await ctx.db.delete(args.sourceTicketId);
+  },
+});

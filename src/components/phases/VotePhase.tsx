@@ -1,14 +1,18 @@
+import { isNullOrEmptyArray } from "@fullstacksjs/toolbox";
 import { useState } from "react";
 import { TicketCard } from "#components/TicketCard.tsx";
 import { Input } from "#components/ui/input.tsx";
 import type { Id } from "#convex/models";
+import type { Session } from "#models/session.ts";
 import type { Ticket } from "#models/ticket.model.ts";
+import type { TicketGroup } from "#models/ticket-group.model.ts";
 import { Button } from "#ui/button.tsx";
+import { TicketGroupCard } from "./TicketGroupCard";
 
 interface VotePhaseProps {
-  session: any;
+  session: Session;
   tickets: Ticket[];
-  ticketGroups?: any[];
+  ticketGroups?: TicketGroup[];
   myVotes?: any[];
   isScrumMaster: boolean;
   onVote: (ticketId?: Id<"tickets">, groupId?: Id<"ticketGroups">) => void;
@@ -62,7 +66,7 @@ export function VotePhase({
       </div>
 
       {/* Groups with votes */}
-      {ticketGroups && ticketGroups.length > 0 && (
+      {!isNullOrEmptyArray(ticketGroups) && (
         <div className="mb-6 space-y-4">
           {ticketGroups.map((group) => {
             const hasVoted = myVotes?.some(
@@ -85,17 +89,7 @@ export function VotePhase({
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-4 gap-3">
-                  {group.tickets.map((ticket: any) => (
-                    <TicketCard
-                      id={ticket._id}
-                      key={ticket._id}
-                      {...ticket}
-                      voteLimit={group.voteLimit}
-                      isGrouped
-                    />
-                  ))}
-                </div>
+                <TicketGroupCard tickets={group.tickets} />
               </div>
             );
           })}

@@ -14,11 +14,10 @@ interface DraggableTicketCardProps {
   isGrouped?: boolean;
   onClick?: () => void;
   onVote?: () => void;
-  className?: string;
 }
 
 export function DraggableTicketCard(props: DraggableTicketCardProps) {
-  const { ref: draggableRef } = useDraggable({
+  const { ref: draggableRef, isDragging } = useDraggable({
     id: props.id,
   });
 
@@ -26,18 +25,18 @@ export function DraggableTicketCard(props: DraggableTicketCardProps) {
     id: props.id,
   });
 
-  // Combine refs by calling both on the same element
   const setRefs = (element: HTMLDivElement | null) => {
     draggableRef(element);
     droppableRef(element);
   };
 
   return (
-    <div ref={setRefs}>
-      <TicketCard
-        {...props}
-        className={isDropTarget ? "ring-2" : props.className}
-      />
+    <div
+      ref={setRefs}
+      className={`relative cursor-grab active:cursor-grabbing touch-none ${isDropTarget ? "ring-2 rounded-lg" : ""} ${isDragging ? "opacity-50" : ""}`}
+    >
+      <TicketCard {...props} />
+      <div className="absolute inset-0" />
     </div>
   );
 }

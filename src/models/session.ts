@@ -7,4 +7,5 @@ export interface Session {
   participantCount: number;
   createdBy: string;
   isActive: boolean;
+  voteLimit?: number;
 }

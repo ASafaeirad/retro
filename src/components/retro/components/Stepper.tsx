@@ -49,7 +49,7 @@ export function Stepper({ phase }: { phase: Phase }) {
                   isUpcoming && "text-foreground-muted",
                 )}
               >
-                {isCompleted ? <Check /> : <span>{index + 1}</span>}
+                <div className="w-2">{isCompleted ? <Check /> : index + 1}</div>
                 {phaseItem.label}
               </h3>
             </div>
@@ -58,6 +58,7 @@ export function Stepper({ phase }: { phase: Phase }) {
               <Arrow
                 className={cn("w-2 mx-2", {
                   "text-foreground-muted": isUpcoming || isCurrent,
+                  "text-emerald-800": isCompleted,
                 })}
               />
             )}

@@ -54,11 +54,10 @@ function RetroBoard() {
     addTicket,
     updateTicket,
     deleteTicket,
-    addTicketToGroup,
     castVote,
     removeVote,
     setVoteLimit,
-    createGroup,
+    mergeTickets,
   } = useRetroSession(sessionId, name);
 
   useRetroEffects({ sessionId, name, updateHeartbeat });
@@ -120,35 +119,17 @@ function RetroBoard() {
   // Handle drag end for grouping
   const handleDragEnd = async (event: DragEndEvent) => {
     if (event.canceled) return;
-
     const { source, target } = event.operation;
     if (!source || !target || source.id === target.id) return;
 
-    const draggedTicket = tickets?.find((t) => t._id === source.id);
-
-    // Check if dropped on the ungrouped zone
-    if (target.id === "ungrouped-zone" && draggedTicket) {
-      await addTicketToGroup({
-        ticketId: draggedTicket._id,
-        groupId: undefined,
-      });
-      return;
-    }
-
-    // Dragging a ticket onto another ticket to create/add to group
+    const sourceTicket = tickets?.find((t) => t._id === source.id);
     const targetTicket = tickets?.find((t) => t._id === target.id);
 
-    if (draggedTicket && targetTicket) {
-      if (targetTicket.groupId) {
-        await addTicketToGroup({
-          ticketId: draggedTicket._id,
-          groupId: targetTicket.groupId,
-        });
-      } else {
-        const groupId = await createGroup({ sessionId });
-        await addTicketToGroup({ ticketId: targetTicket._id, groupId });
-        await addTicketToGroup({ ticketId: draggedTicket._id, groupId });
-      }
+    if (sourceTicket && targetTicket) {
+      await mergeTickets({
+        sourceTicketId: sourceTicket._id,
+        targetTicketId: targetTicket._id,
+      });
     }
   };
 
@@ -226,13 +207,7 @@ function RetroBoard() {
         );
 
       case "GROUP":
-        return (
-          <GroupPhase
-            tickets={tickets}
-            ticketGroups={ticketGroups}
-            onDragEnd={handleDragEnd}
-          />
-        );
+        return <GroupPhase tickets={tickets} onDragEnd={handleDragEnd} />;
 
       case "VOTE":
         return (
