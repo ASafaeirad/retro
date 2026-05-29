@@ -1,9 +1,9 @@
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
 
 import { cn, join } from "#lib/cn";
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   join(
     "inline-flex items-center justify-center whitespace-nowrap rounded-base text-sm font-base cursor-pointer",
     "ring-offset-white transition-all gap-2",
@@ -59,7 +59,7 @@ export function Button({
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : "button";
+  const Comp = asChild ? Slot.Slot : "button";
 
   return (
     <Comp

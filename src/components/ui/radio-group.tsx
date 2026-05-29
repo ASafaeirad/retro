@@ -1,7 +1,4 @@
-import { Label } from "@radix-ui/react-label";
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Circle } from "lucide-react";
-import type * as React from "react";
+import { Label, RadioGroup as RadioGroupPrimitive } from "radix-ui";
 import { cn } from "#lib/cn";
 
 function RadioGroup({
@@ -34,7 +31,7 @@ function RadioGroupItem({
       )}
       {...props}
     >
-      <Label>{children}</Label>
+      <Label.Label>{children}</Label.Label>
     </RadioGroupPrimitive.Item>
   );
 }
