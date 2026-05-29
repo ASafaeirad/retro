@@ -1,6 +1,5 @@
-import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
-import { Crosshair, LogOut } from "lucide-react";
+import { Crosshair } from "lucide-react";
 import { Badge } from "#components/ui/badge.tsx";
 import { Card, CardContent, CardHeader } from "#components/ui/card.tsx";
 import { api } from "#convex/api";
@@ -12,7 +11,6 @@ import {
   type Participant,
 } from "#models/participant.model.ts";
 import { Button } from "#ui/button.tsx";
-import { clearSession } from "../../lib/participantAuth";
 import { ParticipantMood } from "./ParticipantMood";
 
 interface Props {
@@ -33,9 +31,7 @@ export function ParticipantList({
   selectedParticipant,
 }: Props) {
   const updateMood = useMutation(api.retro.updateParticipantMood);
-  const leaveSessionMutation = useMutation(api.retro.leaveSession);
   const removeParticipantMutation = useMutation(api.retro.removeParticipant);
-  const navigate = useNavigate();
   const isScrumMaster = currentUserName === scrumMaster;
 
   const kick = async (participantId: Id<"participants">) => {
@@ -54,22 +50,6 @@ export function ParticipantList({
     } catch (error) {
       console.error("Failed to remove participant:", error);
       alert("Failed to remove participant. Please try again.");
-    }
-  };
-
-  const leaveSession = async (name: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to leave this session? You can rejoin later with the same name.",
-    );
-    if (!confirmed) return;
-
-    try {
-      await leaveSessionMutation({ sessionId, participantName: name });
-      clearSession(sessionId);
-      navigate({ to: "/" });
-    } catch (error) {
-      console.error("Failed to leave session:", error);
-      alert("Failed to leave session. Please try again.");
     }
   };
 
@@ -147,17 +127,6 @@ export function ParticipantList({
                     title="Remove participant"
                   >
                     <Crosshair />
-                  </Button>
-                )}
-                {isMe && (
-                  <Button
-                    size="icon"
-                    onClick={() => leaveSession(participant.name)}
-                    variant="danger"
-                    shadow="reverse"
-                    title="Leave session"
-                  >
-                    <LogOut />
                   </Button>
                 )}
               </div>

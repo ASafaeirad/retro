@@ -299,7 +299,10 @@ function RetroBoard() {
     <div className="min-h-screen py-6 px-4 flex flex-col gap-4 items-center-safe">
       <div className="flex flex-1 gap-6">
         <div className="w-64 flex flex-col gap-4">
-          <RetroHeader />
+          <RetroHeader
+            sessionId={sessionId}
+            participantName={currentParticipant?.name}
+          />
           <ParticipantList
             participants={participants}
             scrumMaster={session.createdBy}
