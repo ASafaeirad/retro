@@ -12,6 +12,7 @@ import { GroupPhase } from "#components/phases/GroupPhase.tsx";
 import { ImReadyControl } from "#components/phases/ImReadyControl.tsx";
 import { PresentPhase } from "#components/phases/PresentPhase.tsx";
 import { ReviewActionsPhase } from "#components/phases/ReviewActionsPhase.tsx";
+import { VoteControl } from "#components/phases/VoteControl.tsx";
 import { VotePhase } from "#components/phases/VotePhase.tsx";
 import { RetroHeader } from "#components/retro/components/RetroHeader.tsx";
 import { Stepper } from "#components/retro/components/Stepper.tsx";
@@ -56,7 +57,6 @@ function RetroBoard() {
     deleteTicket,
     castVote,
     removeVote,
-    setVoteLimit,
     mergeTickets,
   } = useRetroSession(sessionId, name);
 
@@ -158,13 +158,6 @@ function RetroBoard() {
     await castVote({ sessionId, participantName: name, ticketId, groupId });
   };
 
-  // Set vote count
-  const handleSetVoteLimit = async (voteLimit: number) => {
-    if (voteLimit > 0) {
-      await setVoteLimit({ sessionId, voteLimit });
-    }
-  };
-
   // Name entry if not set
   if (!name) {
     return <JoinForm sessionId={sessionId as Id<"sessions">} />;
@@ -214,11 +207,8 @@ function RetroBoard() {
           <VotePhase
             session={session}
             tickets={tickets}
-            ticketGroups={ticketGroups}
             myVotes={myVotes}
-            isScrumMaster={isScrumMaster}
             onVote={handleVote}
-            onSetVoteLimit={handleSetVoteLimit}
           />
         );
 
@@ -301,6 +291,7 @@ function RetroBoard() {
               isReady={currentParticipant?.isReady || false}
             />
           )}
+          {session.phase === "VOTE" && <VoteControl session={session} />}
 
           {isScrumMaster ? (
             <PhaseControls

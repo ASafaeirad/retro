@@ -2,9 +2,12 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import type { Participant } from "#models/participant.model.ts";
+import type { Session } from "#models/session.ts";
 
 export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
-  const session = useQuery(api.retro.getSession, { sessionId });
+  const session = useQuery(api.retro.getSession, { sessionId }) as
+    | Session
+    | undefined;
   const participants = useQuery(api.retro.getParticipants, {
     sessionId,
   }) as Participant[];
@@ -26,7 +29,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   const mergeTickets = useMutation(api.retro.mergeTickets);
   const castVote = useMutation(api.retro.castVote);
   const removeVote = useMutation(api.retro.removeVote);
-  const setVoteLimit = useMutation(api.retro.setVoteLimit);
   const startTimer = useMutation(api.retro.startTimer);
   const pauseTimer = useMutation(api.retro.pauseTimer);
   const resumeTimer = useMutation(api.retro.resumeTimer);
@@ -59,7 +61,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     mergeTickets,
     castVote,
     removeVote,
-    setVoteLimit,
     startTimer,
     pauseTimer,
     resumeTimer,
