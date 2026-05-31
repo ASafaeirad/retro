@@ -4,7 +4,7 @@ import {
   useSearch,
 } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/retro/$sessionId")({
 function RetroBoard() {
   const { sessionId } = Route.useParams() as { sessionId: Id<"sessions"> };
   const { name } = useSearch({ from: "/retro/$sessionId" });
-  const [selectedParticipant, setSelectedParticipant] = useState<string>();
+  const setCurrentPresenter = useMutation(api.retro.setCurrentPresenter);
   const navigate = useNavigate();
   const session = useQuery(api.retro.getSession, { sessionId }) as
     | Session
@@ -100,7 +100,7 @@ function RetroBoard() {
 
   const handlePhaseChange = async (phase: Phase) => {
     if (!isScrumMaster || !name) return;
-    setSelectedParticipant(undefined);
+    await setCurrentPresenter({ sessionId, presenterName: undefined });
     await updatePhase({ sessionId, phase, requestedBy: name });
   };
 
@@ -171,7 +171,7 @@ function RetroBoard() {
         return (
           <PresentPhase
             tickets={tickets}
-            selectedParticipant={selectedParticipant}
+            selectedParticipant={session.currentPresenter}
           />
         );
 
@@ -219,14 +219,11 @@ function RetroBoard() {
             scrumMaster={session.createdBy}
             currentUserName={name}
             sessionId={session._id}
-            selectedParticipant={selectedParticipant}
+            selectedParticipant={session.currentPresenter}
             onSelectPresenter={
               session.phase === "PRESENT"
-                ? (name) => {
-                    setSelectedParticipant((prev) =>
-                      prev === name ? undefined : name,
-                    );
-                  }
+                ? (name) =>
+                    setCurrentPresenter({ sessionId, presenterName: name })
                 : undefined
             }
           />

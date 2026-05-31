@@ -16,4 +16,5 @@ export interface Session {
   isActive: boolean;
   voteLimit?: number;
   timerState: TimerState;
+  currentPresenter?: string;
 }
