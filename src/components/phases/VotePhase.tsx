@@ -1,5 +1,4 @@
 import { useMutation } from "convex/react";
-import { useState } from "react";
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
 import { api } from "#convex/api";
@@ -48,6 +47,7 @@ export function VotePhase({
             const hasVoted = myVotes?.some(
               (vote) => vote.ticketId === ticket._id,
             );
+
             return (
               <TicketCard
                 key={ticket._id}

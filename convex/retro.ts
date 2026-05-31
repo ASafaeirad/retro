@@ -73,20 +73,16 @@ export const getTickets = query({
       .withIndex("sessionId", (q) => q.eq("sessionId", args.sessionId))
       .collect();
 
-    // Attach vote counts to each ticket
     return await Promise.all(
       tickets.map(async (ticket) => {
-        const voteLimit = (
+        const votes = (
           await ctx.db
             .query("votes")
             .withIndex("ticketId", (q) => q.eq("ticketId", ticket._id))
             .collect()
         ).length;
 
-        return {
-          ...ticket,
-          voteLimit,
-        };
+        return { ...ticket, votes };
       }),
     );
   },

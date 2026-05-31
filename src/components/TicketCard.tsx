@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter } from "./ui/card";
 import { Textarea } from "./ui/textarea";
 import { Toggle } from "./ui/toggle";
 
-interface TicketCardProps {
+interface Props {
   text: string;
   author?: string;
   imageUrl?: string;
@@ -19,11 +19,13 @@ interface TicketCardProps {
   onDelete?: () => void;
   currentUserName?: string;
   readonly?: boolean;
+  votes?: number;
 }
 
 export function TicketCard({
   text,
   author,
+  votes = 0,
   imageUrl,
   isDimmed = false,
   hasVoted = false,
@@ -33,7 +35,7 @@ export function TicketCard({
   onDelete,
   currentUserName,
   readonly,
-}: TicketCardProps) {
+}: Props) {
   const isAuthor = currentUserName && currentUserName === author;
   const [optimisticText, setOptimisticText] = useState(text);
   const [debouncedFn] = useState(() =>
@@ -69,7 +71,8 @@ export function TicketCard({
             )}
             {onVote && (
               <div>
-                <Toggle onClick={onVote} size="xs">
+                <Toggle onClick={onVote} defaultChecked={hasVoted} size="xs">
+                  <span className="font-bold">{votes}</span>
                   <ThumbsUp />
                 </Toggle>
               </div>
