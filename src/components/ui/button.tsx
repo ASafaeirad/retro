@@ -30,6 +30,7 @@ export const buttonVariants = cva(
         reverse:
           "hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-shadow",
         none: "shadow-none",
+        fixed: "shadow-shadow",
       },
       size: {
         default: "h-9 px-3 py-2",
