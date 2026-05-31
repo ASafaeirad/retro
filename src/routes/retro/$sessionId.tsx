@@ -267,7 +267,9 @@ function RetroBoard() {
               isReady={currentParticipant?.isReady || false}
             />
           )}
-          {session.phase === "VOTE" && <VoteControl session={session} />}
+          {session.phase === "VOTE" && (
+            <VoteControl session={session} disabled={!isScrumMaster} />
+          )}
 
           {isScrumMaster ? (
             <PhaseControls

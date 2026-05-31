@@ -11,10 +11,16 @@ import type { Session } from "#models/session.ts";
 
 const voteCounts = [1, 2, 3, 4, 5];
 
-export const VoteControl = ({ session }: { session: Session }) => {
+type Props = {
+  session: Session;
+  disabled?: boolean;
+};
+
+export const VoteControl = ({ session, disabled }: Props) => {
   const setVoteLimit = useMutation(api.retro.setVoteLimit);
   const value = session.voteLimit;
   const submit = (v: string) => {
+    if (disabled) return;
     setVoteLimit({ sessionId: session._id, voteLimit: Number(v) });
   };
 
@@ -28,6 +34,7 @@ export const VoteControl = ({ session }: { session: Session }) => {
           <p className="text-sm">Waiting for scrum master to set vote count</p>
         </CardBlock>
         <RadioGroup
+          disabled={disabled}
           value={value?.toString()}
           onValueChange={submit}
           className="flex w-full justify-between"
