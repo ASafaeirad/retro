@@ -5,6 +5,7 @@ import { Logo } from "#components/logo/Logo.tsx";
 import { CreateSessionModal } from "#components/retro/components/CreateSessionModal.tsx";
 import { SessionList } from "#components/SessionList.tsx";
 import { api } from "#convex/api";
+import type { Session } from "#models/session.ts";
 import { Button } from "#ui/button.tsx";
 import { generateToken, storeSession } from "../lib/auth.ts";
 
@@ -14,7 +15,9 @@ export const Route = createFileRoute("/")({
 
 function RetroSessionsPage() {
   const navigate = useNavigate();
-  const sessions = useQuery(api.retro.listSessions, { includeCompleted: true });
+  const sessions = useQuery(api.retro.listSessions, {
+    includeCompleted: true,
+  }) as Session[];
   const createSession = useMutation(api.retro.createSession);
 
   const [isCreating, setIsCreating] = useState(false);
@@ -77,7 +80,11 @@ function RetroSessionsPage() {
           + Create
         </Button>
       </SessionList>
-      <SessionList sessions={completedSessions} title="Completed Sessions" />
+      <SessionList sessions={completedSessions} title="Completed Sessions">
+        <Button size="sm" onClick={() => setIsCreating(true)}>
+          + Create
+        </Button>
+      </SessionList>
 
       {sessions.length === 0 && (
         <div>
