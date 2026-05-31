@@ -13,6 +13,7 @@ const voteCounts = [1, 2, 3, 4, 5];
 
 export const VoteControl = ({ session }: { session: Session }) => {
   const setVoteLimit = useMutation(api.retro.setVoteLimit);
+  const value = session.voteLimit;
   const submit = (v: string) => {
     setVoteLimit({ sessionId: session._id, voteLimit: Number(v) });
   };
@@ -27,6 +28,7 @@ export const VoteControl = ({ session }: { session: Session }) => {
           <p className="text-sm">Waiting for scrum master to set vote count</p>
         </CardBlock>
         <RadioGroup
+          value={value?.toString()}
           onValueChange={submit}
           className="flex w-full justify-between"
         >

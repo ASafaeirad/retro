@@ -59,28 +59,19 @@ export default defineSchema({
     author: v.string(), // participant name
     category: v.union(v.literal("well"), v.literal("improve")),
     imageUrl: v.optional(v.string()),
-    groupId: v.optional(v.id("ticketGroups")),
     order: v.number(), // for sorting
   })
     .index("sessionId", ["sessionId"])
-    .index("sessionAndCategory", ["sessionId", "category"])
-    .index("groupId", ["groupId"]),
-
-  ticketGroups: defineTable({
-    sessionId: v.id("sessions"),
-    name: v.optional(v.string()), // optional group name
-  }).index("sessionId", ["sessionId"]),
+    .index("sessionAndCategory", ["sessionId", "category"]),
 
   votes: defineTable({
     sessionId: v.id("sessions"),
     participantName: v.string(),
     ticketId: v.optional(v.id("tickets")),
-    groupId: v.optional(v.id("ticketGroups")),
   })
     .index("sessionId", ["sessionId"])
     .index("sessionAndParticipant", ["sessionId", "participantName"])
-    .index("ticketId", ["ticketId"])
-    .index("groupId", ["groupId"]),
+    .index("ticketId", ["ticketId"]),
 
   actionItems: defineTable({
     text: v.string(),

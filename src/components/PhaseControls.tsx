@@ -26,7 +26,7 @@ const PHASE_FLOW: { phase: Phase; label: string; description: string }[] = [
     description: "Present tickets one by one",
   },
   { phase: "GROUP", label: "Group", description: "Group related tickets" },
-  { phase: "VOTE", label: "Vote", description: "Vote on tickets and groups" },
+  { phase: "VOTE", label: "Vote", description: "Vote on tickets" },
   {
     phase: "DISCUSS",
     label: "Discuss",

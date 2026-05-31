@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import { cn } from "#lib/cn";
@@ -52,7 +51,6 @@ export function ActionItemPanel({
             text={item.text}
             author={currentUser}
             currentUserName={currentUser}
-            voteLimit={0}
             isDimmed={item.completed}
             onDelete={() => deleteActionItem({ actionItemId: item._id })}
             onClick={() => {}}

@@ -116,7 +116,6 @@ function RetroBoard() {
     }
   };
 
-  // Handle drag end for grouping
   const handleDragEnd = async (event: DragEndEvent) => {
     if (event.canceled) return;
     const { source, target } = event.operation;
@@ -134,29 +133,6 @@ function RetroBoard() {
   };
 
   // Handle voting (toggle: vote if not voted, withdraw if already voted)
-  const handleVote = async (
-    ticketId?: Id<"tickets">,
-    groupId?: Id<"ticketGroups">,
-  ) => {
-    if (!name) return;
-
-    const existingVote = myVotes?.find((vote) =>
-      ticketId ? vote.ticketId === ticketId : vote.groupId === groupId,
-    );
-
-    if (existingVote) {
-      await removeVote({ voteId: existingVote._id });
-      return;
-    }
-
-    const votesLeft = (session?.voteLimit || 0) - (myVotes?.length || 0);
-    if (votesLeft <= 0) {
-      alert("You have used all your votes!");
-      return;
-    }
-
-    await castVote({ sessionId, participantName: name, ticketId, groupId });
-  };
 
   // Name entry if not set
   if (!name) {
@@ -208,7 +184,7 @@ function RetroBoard() {
             session={session}
             tickets={tickets}
             myVotes={myVotes}
-            onVote={handleVote}
+            currentUser={name}
           />
         );
 

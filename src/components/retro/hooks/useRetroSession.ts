@@ -12,7 +12,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     sessionId,
   }) as Participant[];
   const tickets = useQuery(api.retro.getTickets, { sessionId });
-  const ticketGroups = useQuery(api.retro.getTicketGroups, { sessionId });
   const votes = useQuery(api.retro.getVotes, { sessionId });
   const myVotes = useQuery(
     api.retro.getParticipantVotes,
@@ -24,8 +23,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
   const updateTicket = useMutation(api.retro.updateTicket);
   const deleteTicket = useMutation(api.retro.deleteTicket);
   const setCurrentPresenter = useMutation(api.retro.setCurrentPresenter);
-  const createGroup = useMutation(api.retro.createGroup);
-  const addTicketToGroup = useMutation(api.retro.addTicketToGroup);
   const mergeTickets = useMutation(api.retro.mergeTickets);
   const castVote = useMutation(api.retro.castVote);
   const removeVote = useMutation(api.retro.removeVote);
@@ -46,7 +43,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     session,
     participants,
     tickets,
-    ticketGroups,
     votes,
     myVotes,
     // Mutations
@@ -56,8 +52,6 @@ export function useRetroSession(sessionId: Id<"sessions">, name?: string) {
     updateTicket,
     deleteTicket,
     setCurrentPresenter,
-    createGroup,
-    addTicketToGroup,
     mergeTickets,
     castVote,
     removeVote,

@@ -5,6 +5,7 @@ import { cn } from "#lib/cn";
 import { Button } from "#ui/button.tsx";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Textarea } from "./ui/textarea";
+import { Toggle } from "./ui/toggle";
 
 interface TicketCardProps {
   text: string;
@@ -53,17 +54,26 @@ export function TicketCard({
       })}
     >
       <CardContent className="px-1">
-        {isAuthor && onDelete && (
+        {((isAuthor && onDelete) || onVote) && (
           <div className="absolute right-2 top-2 flex gap-1">
-            <Button
-              onClick={onDelete}
-              size="icon"
-              variant="danger"
-              shadow="reverse"
-              title="Delete ticket"
-            >
-              <Trash />
-            </Button>
+            {isAuthor && onDelete && (
+              <Button
+                onClick={onDelete}
+                size="icon"
+                variant="danger"
+                shadow="reverse"
+                title="Delete ticket"
+              >
+                <Trash />
+              </Button>
+            )}
+            {onVote && (
+              <div>
+                <Toggle onClick={onVote} size="xs">
+                  <ThumbsUp />
+                </Toggle>
+              </div>
+            )}
           </div>
         )}
 
@@ -92,20 +102,8 @@ export function TicketCard({
           autoFocus
         />
       </CardContent>
-      <CardFooter className="absolute bottom-1 left-1 flex items-center justify-between px-1">
+      <CardFooter className="absolute w-full bottom-1 left-1 flex items-center justify-between pl-1">
         <span className="text-xs text-foreground-muted">{author}</span>
-
-        {onVote && (
-          <div>
-            <Button
-              onClick={onVote}
-              size="xs"
-              shadow={hasVoted ? "reverse" : "default"}
-            >
-              <ThumbsUp />
-            </Button>
-          </div>
-        )}
       </CardFooter>
     </Card>
   );
