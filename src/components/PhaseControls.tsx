@@ -32,6 +32,11 @@ const PHASE_FLOW: { phase: Phase; label: string; description: string }[] = [
     label: "Discuss",
     description: "Discuss voted items with timer",
   },
+  {
+    phase: "COMPLETED",
+    label: "Completed",
+    description: "All phases are completed",
+  },
 ];
 
 export function PhaseControls({
