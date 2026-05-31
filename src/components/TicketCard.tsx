@@ -76,7 +76,7 @@ export function TicketCard({
               <Toggle
                 onClick={onVote}
                 disabled={!onVote}
-                defaultChecked={hasVoted}
+                checked={hasVoted}
                 size="xs"
               >
                 <span className="font-bold">{votes}</span>
