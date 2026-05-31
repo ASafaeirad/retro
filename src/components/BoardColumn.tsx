@@ -6,7 +6,6 @@ interface BoardColumnProps {
   title: string;
   category: "well" | "improve";
   children: ReactNode;
-  className?: string;
 }
 
 export function BoardColumn({ title, category, children }: BoardColumnProps) {

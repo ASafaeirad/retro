@@ -2,12 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { useState } from "react";
 import { MoodPicker } from "#components/MoodPicker.tsx";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "#components/ui/card.tsx";
+import { Card, CardContent, CardHeader } from "#components/ui/card.tsx";
 import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import type { Mood } from "#models/mood.model.tsx";
