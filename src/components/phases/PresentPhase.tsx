@@ -20,6 +20,7 @@ export function PresentPhase({ tickets, selectedParticipant }: Props) {
             isDimmed={
               !!selectedParticipant && ticket.author !== selectedParticipant
             }
+            hideVotes
           />
         ))}
       </BoardColumn>
@@ -34,6 +35,7 @@ export function PresentPhase({ tickets, selectedParticipant }: Props) {
                 ? ticket.author !== selectedParticipant
                 : false
             }
+            hideVotes
           />
         ))}
       </BoardColumn>

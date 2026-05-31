@@ -36,11 +36,7 @@ export function AddTicketsPhase({
 
   return (
     <div className="h-full grid grid-cols-2 gap-6">
-      <BoardColumn
-        title="What Went Well"
-        category="well"
-        onAdd={() => handleAddTicket("well")}
-      >
+      <BoardColumn title="What Went Well" category="well">
         <Button
           onClick={() => handleAddTicket("well")}
           variant="neutral"
@@ -57,15 +53,12 @@ export function AddTicketsPhase({
               return onEditTicket(ticket._id, text, ticket.imageUrl);
             }}
             onDelete={() => onDeleteTicket(ticket._id)}
+            hideVotes
           />
         ))}
       </BoardColumn>
 
-      <BoardColumn
-        title="To Improve"
-        category="improve"
-        onAdd={() => handleAddTicket("improve")}
-      >
+      <BoardColumn title="To Improve" category="improve">
         <Button
           onClick={() => handleAddTicket("improve")}
           variant="neutral"
@@ -80,6 +73,7 @@ export function AddTicketsPhase({
             currentUserName={currentUserName}
             onEdit={(text) => onEditTicket(ticket._id, text, ticket.imageUrl)}
             onDelete={() => onDeleteTicket(ticket._id)}
+            hideVotes
           />
         ))}
       </BoardColumn>

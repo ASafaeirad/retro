@@ -1,16 +1,14 @@
 import { useMemo } from "react";
+import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
 import { Timer } from "#components/Timer.tsx";
 import type { Id } from "#convex/models";
-import { cn } from "#lib/cn";
-import type { Ticket } from "#models/ticket.model.ts";
-import { Button } from "#ui/button.tsx";
+import type { Session } from "#models/session.ts";
+import { groupByCategory, type Ticket } from "#models/ticket.model.ts";
 
 interface DiscussPhaseProps {
-  session: any;
-  sessionId: Id<"sessions">;
+  session: Session;
   tickets: Ticket[];
-  isScrumMaster: boolean;
   onStartTimer: (duration: number, ticketId?: Id<"tickets">) => void;
   onPauseTimer: () => void;
   onResumeTimer: () => void;
@@ -20,26 +18,25 @@ interface DiscussPhaseProps {
 
 export function DiscussPhase({
   session,
-  sessionId,
   tickets,
-  isScrumMaster,
   onStartTimer,
   onPauseTimer,
   onResumeTimer,
   onExtendTimer,
   onCompleteDiscussion,
 }: DiscussPhaseProps) {
-  const sortedTickets = useMemo(() => tickets.toSorted(), [tickets]);
+  const { wellTickets, improveTickets } = groupByCategory(tickets);
+  const sortedWellTickets = useMemo(
+    () => wellTickets.toSorted((a, b) => b.votes - a.votes),
+    [wellTickets],
+  );
+  const sortedImproveTickets = useMemo(
+    () => improveTickets.toSorted((a, b) => b.votes - a.votes),
+    [improveTickets],
+  );
 
   return (
     <div>
-      <div className="mb-6 rounded-lg border p-6">
-        <h2 className="mb-2 text-2xl font-bold">
-          Discuss & Create Action Items
-        </h2>
-        <p>Discuss tickets sorted by votes and create action items</p>
-      </div>
-
       {session.timerState && (
         <div className="mb-6">
           <Timer
@@ -52,10 +49,17 @@ export function DiscussPhase({
         </div>
       )}
 
-      <div className="space-y-4">
-        {sortedTickets.map((item) => (
-          <TicketCard key={item._id} {...item} />
-        ))}
+      <div className="h-full grid grid-cols-2 gap-6">
+        <BoardColumn title="What Went Well" category="well">
+          {sortedWellTickets.map((item) => (
+            <TicketCard isDimmed={item.votes === 0} key={item._id} {...item} />
+          ))}
+        </BoardColumn>
+        <BoardColumn title="To Improve" category="improve">
+          {sortedImproveTickets.map((item) => (
+            <TicketCard isDimmed={item.votes === 0} key={item._id} {...item} />
+          ))}
+        </BoardColumn>
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ interface Props {
   currentUserName?: string;
   readonly?: boolean;
   votes?: number;
+  hideVotes?: boolean;
 }
 
 export function TicketCard({
@@ -27,6 +28,7 @@ export function TicketCard({
   author,
   votes = 0,
   imageUrl,
+  hideVotes = false,
   isDimmed = false,
   hasVoted = false,
   onClick,
@@ -56,29 +58,33 @@ export function TicketCard({
       })}
     >
       <CardContent className="px-1">
-        {((isAuthor && onDelete) || onVote) && (
-          <div className="absolute right-2 top-2 flex gap-1">
-            {isAuthor && onDelete && (
-              <Button
-                onClick={onDelete}
-                size="icon"
-                variant="danger"
-                shadow="reverse"
-                title="Delete ticket"
+        <div className="absolute right-2 top-2 flex gap-1 items-center">
+          {isAuthor && onDelete && (
+            <Button
+              onClick={onDelete}
+              size="icon"
+              variant="danger"
+              shadow="reverse"
+              title="Delete ticket"
+            >
+              <Trash />
+            </Button>
+          )}
+
+          {!hideVotes && (
+            <div>
+              <Toggle
+                onClick={onVote}
+                disabled={!onVote}
+                defaultChecked={hasVoted}
+                size="xs"
               >
-                <Trash />
-              </Button>
-            )}
-            {onVote && (
-              <div>
-                <Toggle onClick={onVote} defaultChecked={hasVoted} size="xs">
-                  <span className="font-bold">{votes}</span>
-                  <ThumbsUp />
-                </Toggle>
-              </div>
-            )}
-          </div>
-        )}
+                <span className="font-bold">{votes}</span>
+                <ThumbsUp />
+              </Toggle>
+            </div>
+          )}
+        </div>
 
         {/* {imageUrl && (
         <div className="mb-3 overflow-hidden rounded-md">

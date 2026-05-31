@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { cn } from "#lib/cn";
-import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 
 interface BoardColumnProps {
@@ -8,15 +7,9 @@ interface BoardColumnProps {
   category: "well" | "improve";
   children: ReactNode;
   className?: string;
-  onAdd?: () => void;
 }
 
-export function BoardColumn({
-  title,
-  category,
-  children,
-  onAdd,
-}: BoardColumnProps) {
+export function BoardColumn({ title, category, children }: BoardColumnProps) {
   return (
     <Card
       space="compact"

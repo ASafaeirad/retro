@@ -2,19 +2,9 @@ import { useDraggable, useDroppable } from "@dnd-kit/react";
 import type { Id } from "#convex/models";
 import { TicketCard } from "./TicketCard";
 
-interface DraggableTicketCardProps {
+type DraggableTicketCardProps = React.ComponentProps<typeof TicketCard> & {
   id: Id<"tickets">;
-  text: string;
-  author?: string;
-  imageUrl?: string;
-  voteLimit?: number;
-  category: "well" | "improve";
-  isHighlighted?: boolean;
-  isDimmed?: boolean;
-  isGrouped?: boolean;
-  onClick?: () => void;
-  onVote?: () => void;
-}
+};
 
 export function DraggableTicketCard(props: DraggableTicketCardProps) {
   const { ref: draggableRef, isDragging } = useDraggable({

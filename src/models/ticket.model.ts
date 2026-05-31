@@ -7,6 +7,7 @@ export interface Ticket {
   author?: string;
   imageUrl?: string;
   category: TicketCategory;
+  votes: number;
 }
 
 export const groupByCategory = (tickets: Ticket[]) => {

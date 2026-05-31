@@ -16,13 +16,23 @@ export function GroupPhase({ tickets, onDragEnd }: GroupPhaseProps) {
       <div className="h-full grid grid-cols-2 gap-6">
         <BoardColumn title="What Went Well" category="well">
           {wellTickets.map((ticket) => (
-            <DraggableTicketCard key={ticket._id} id={ticket._id} {...ticket} />
+            <DraggableTicketCard
+              key={ticket._id}
+              id={ticket._id}
+              {...ticket}
+              hideVotes
+            />
           ))}
         </BoardColumn>
 
         <BoardColumn title="To Improve" category="improve">
           {improveTickets.map((ticket) => (
-            <DraggableTicketCard key={ticket._id} id={ticket._id} {...ticket} />
+            <DraggableTicketCard
+              key={ticket._id}
+              id={ticket._id}
+              {...ticket}
+              hideVotes
+            />
           ))}
         </BoardColumn>
       </div>
