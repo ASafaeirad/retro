@@ -1,6 +1,8 @@
+import { useMutation } from "convex/react";
 import { BoardColumn } from "#components/BoardColumn.tsx";
 import { TicketCard } from "#components/TicketCard.tsx";
 import { Button } from "#components/ui/button.tsx";
+import { api } from "#convex/api";
 import type { Id } from "#convex/models";
 import type { Ticket, TicketCategory } from "#models/ticket.model.ts";
 
@@ -12,7 +14,6 @@ interface Props {
     category: TicketCategory,
     imageUrl?: string,
   ) => Promise<unknown>;
-  onDeleteTicket: (ticketId: Id<"tickets">) => void;
   onEditTicket: (
     ticketId: Id<"tickets">,
     text: string,
@@ -25,13 +26,27 @@ export function AddTicketsPhase({
   currentUserName,
   onAddTicket,
   onEditTicket,
-  onDeleteTicket,
 }: Props) {
   const wellTickets = tickets.filter((t) => t.category === "well");
   const improveTickets = tickets.filter((t) => t.category === "improve");
+  const deleteTicket = useMutation(api.retro.deleteTicket);
 
   const handleAddTicket = async (category: "well" | "improve") => {
     await onAddTicket("", category);
+  };
+
+  const handleDeleteTicket = async (ticketId: Id<"tickets">) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this ticket?",
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteTicket({ ticketId, author: currentUserName });
+    } catch (error) {
+      console.error("Failed to delete ticket:", error);
+      alert("Failed to delete ticket. Please try again.");
+    }
   };
 
   return (
@@ -52,7 +67,7 @@ export function AddTicketsPhase({
             onEdit={(text) => {
               return onEditTicket(ticket._id, text, ticket.imageUrl);
             }}
-            onDelete={() => onDeleteTicket(ticket._id)}
+            onDelete={() => handleDeleteTicket(ticket._id)}
             hideVotes
           />
         ))}
@@ -72,7 +87,7 @@ export function AddTicketsPhase({
             {...ticket}
             currentUserName={currentUserName}
             onEdit={(text) => onEditTicket(ticket._id, text, ticket.imageUrl)}
-            onDelete={() => onDeleteTicket(ticket._id)}
+            onDelete={() => handleDeleteTicket(ticket._id)}
             hideVotes
           />
         ))}

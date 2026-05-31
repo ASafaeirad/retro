@@ -126,6 +126,18 @@ export const getActionItems = query({
 
 // ===== MUTATIONS =====
 
+export const editActionItem = mutation({
+  args: {
+    actionItemId: v.id("actionItems"),
+    text: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.actionItemId, {
+      text: args.text,
+    });
+  },
+});
+
 export const createSession = mutation({
   args: {
     sprintNumber: v.number(),

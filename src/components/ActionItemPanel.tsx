@@ -22,6 +22,7 @@ export function ActionItemPanel({
   const actionItems = useQuery(api.retro.getActionItems, { sessionId });
   const createActionItem = useMutation(api.retro.createActionItem);
   const deleteActionItem = useMutation(api.retro.deleteActionItem);
+  const onEditTicket = useMutation(api.retro.editActionItem);
 
   const handleCreate = () => {
     createActionItem({
@@ -53,7 +54,8 @@ export function ActionItemPanel({
             currentUserName={currentUser}
             isDimmed={item.completed}
             onDelete={() => deleteActionItem({ actionItemId: item._id })}
-            onClick={() => {}}
+            onEdit={(text) => onEditTicket({ actionItemId: item._id, text })}
+            hideVotes
           />
         ))}
 

@@ -1,6 +1,10 @@
-import type { DragEndEvent } from "@dnd-kit/react";
-import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
+import { useMutation, useQuery } from "convex/react";
+import { useEffect, useState } from "react";
 import { ActionItemPanel } from "#components/ActionItemPanel.tsx";
 import { JoinForm } from "#components/JoinForm.tsx";
 import { PhaseControls } from "#components/PhaseControls.tsx";
@@ -16,10 +20,12 @@ import { VoteControl } from "#components/phases/VoteControl.tsx";
 import { VotePhase } from "#components/phases/VotePhase.tsx";
 import { RetroHeader } from "#components/retro/components/RetroHeader.tsx";
 import { Stepper } from "#components/retro/components/Stepper.tsx";
-import { useRetroEffects } from "#components/retro/hooks/useRetroEffects.ts";
-import { useRetroSession } from "#components/retro/hooks/useRetroSession.ts";
+import { api } from "#convex/api";
 import type { Id } from "#convex/models";
+import { getStoredSession } from "#lib/auth";
+import type { Participant } from "#models/participant.model.ts";
 import type { Phase } from "#models/phase.model.ts";
+import type { Session } from "#models/session.ts";
 import type { TicketCategory } from "#models/ticket.model.ts";
 
 export const Route = createFileRoute("/retro/$sessionId")({
@@ -35,32 +41,62 @@ function RetroBoard() {
   const { sessionId } = Route.useParams() as { sessionId: Id<"sessions"> };
   const { name } = useSearch({ from: "/retro/$sessionId" });
   const [selectedParticipant, setSelectedParticipant] = useState<string>();
+  const navigate = useNavigate();
+  const session = useQuery(api.retro.getSession, { sessionId }) as
+    | Session
+    | undefined;
+  const participants = useQuery(api.retro.getParticipants, {
+    sessionId,
+  }) as Participant[];
+  const tickets = useQuery(api.retro.getTickets, { sessionId });
+  const myVotes = useQuery(
+    api.retro.getParticipantVotes,
+    name ? { sessionId, participantName: name } : "skip",
+  );
+  const updatePhase = useMutation(api.retro.updatePhase);
+  const toggleReady = useMutation(api.retro.toggleReady);
+  const addTicket = useMutation(api.retro.addTicket);
+  const updateTicket = useMutation(api.retro.updateTicket);
+  const updateHeartbeat = useMutation(api.retro.updateHeartbeat);
+  const isScrumMaster = session?.createdBy === name;
+  const currentParticipant = participants?.find((p) => p.name === name);
 
-  const {
-    session,
-    participants,
-    tickets,
-    ticketGroups,
-    isScrumMaster,
-    currentParticipant,
-    myVotes,
-    startTimer,
-    pauseTimer,
-    resumeTimer,
-    extendTimer,
-    completeDiscussion,
-    updateHeartbeat,
-    updatePhase,
-    toggleReady,
-    addTicket,
-    updateTicket,
-    deleteTicket,
-    castVote,
-    removeVote,
-    mergeTickets,
-  } = useRetroSession(sessionId, name);
+  // Auto-rejoin logic: If no name in URL, check localStorage for stored session
+  useEffect(() => {
+    if (!name) {
+      const stored = getStoredSession(sessionId);
+      if (stored) {
+        navigate({
+          to: `/retro/${sessionId}`,
+          search: { name: stored.name },
+          replace: true,
+        });
+      }
+    }
+  }, [name, sessionId, navigate]);
 
-  useRetroEffects({ sessionId, name, updateHeartbeat });
+  // Heartbeat system: Send heartbeat every 30 seconds to update lastActiveAt
+  useEffect(() => {
+    if (!name) return;
+
+    // Send initial heartbeat
+    updateHeartbeat({ sessionId, participantName: name }).catch(
+      (error: Error) => {
+        console.error("Failed to send heartbeat:", error);
+      },
+    );
+
+    // Set up interval for periodic heartbeats
+    const heartbeatInterval = setInterval(() => {
+      updateHeartbeat({ sessionId, participantName: name }).catch(
+        (error: Error) => {
+          console.error("Failed to send heartbeat:", error);
+        },
+      );
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(heartbeatInterval);
+  }, [name, sessionId, updateHeartbeat]);
 
   const handlePhaseChange = async (phase: Phase) => {
     if (!isScrumMaster || !name) return;
@@ -100,41 +136,7 @@ function RetroBoard() {
   };
 
   // Delete ticket
-  const handleDeleteTicket = async (ticketId: Id<"tickets">) => {
-    if (!name) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this ticket?",
-    );
-    if (!confirmed) return;
-
-    try {
-      await deleteTicket({ ticketId, author: name });
-    } catch (error) {
-      console.error("Failed to delete ticket:", error);
-      alert("Failed to delete ticket. Please try again.");
-    }
-  };
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    if (event.canceled) return;
-    const { source, target } = event.operation;
-    if (!source || !target || source.id === target.id) return;
-
-    const sourceTicket = tickets?.find((t) => t._id === source.id);
-    const targetTicket = tickets?.find((t) => t._id === target.id);
-
-    if (sourceTicket && targetTicket) {
-      await mergeTickets({
-        sourceTicketId: sourceTicket._id,
-        targetTicketId: targetTicket._id,
-      });
-    }
-  };
-
-  // Handle voting (toggle: vote if not voted, withdraw if already voted)
-
-  // Name entry if not set
   if (!name) {
     return <JoinForm sessionId={sessionId as Id<"sessions">} />;
   }
@@ -148,7 +150,6 @@ function RetroBoard() {
   }
   const sessionNumber = session.sprintNumber;
 
-  // Render phase-specific content
   const renderPhaseContent = () => {
     switch (session.phase) {
       case "REVIEW_ACTIONS":
@@ -163,7 +164,6 @@ function RetroBoard() {
             currentUserName={name}
             onAddTicket={handleAddTicket}
             onEditTicket={handleEditTicket}
-            onDeleteTicket={handleDeleteTicket}
           />
         );
 
@@ -176,7 +176,7 @@ function RetroBoard() {
         );
 
       case "GROUP":
-        return <GroupPhase tickets={tickets} onDragEnd={handleDragEnd} />;
+        return <GroupPhase tickets={tickets} />;
 
       case "VOTE":
         return (
@@ -189,37 +189,7 @@ function RetroBoard() {
         );
 
       case "DISCUSS":
-        return (
-          <DiscussPhase
-            session={session}
-            sessionId={sessionId as Id<"sessions">}
-            tickets={tickets}
-            ticketGroups={ticketGroups}
-            isScrumMaster={isScrumMaster}
-            onStartTimer={(duration, ticketId) =>
-              startTimer({
-                sessionId: sessionId as Id<"sessions">,
-                duration,
-                ticketId,
-              })
-            }
-            onPauseTimer={() =>
-              pauseTimer({ sessionId: sessionId as Id<"sessions"> })
-            }
-            onResumeTimer={() =>
-              resumeTimer({ sessionId: sessionId as Id<"sessions"> })
-            }
-            onExtendTimer={(time) =>
-              extendTimer({
-                sessionId: sessionId as Id<"sessions">,
-                additionalTime: time,
-              })
-            }
-            onCompleteDiscussion={() =>
-              completeDiscussion({ sessionId: sessionId as Id<"sessions"> })
-            }
-          />
-        );
+        return <DiscussPhase tickets={tickets} />;
 
       case "COMPLETED":
         return <CompletedPhase sprintNumber={session.sprintNumber} />;
